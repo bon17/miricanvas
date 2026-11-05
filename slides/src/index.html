@@ -177,6 +177,36 @@ body{font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic
 #help kbd{background:#fff;color:#000;border-radius:6px;padding:2px 10px;font-weight:800}
 .static *,.static *::before,.static *::after{animation-duration:0s!important;animation-delay:0s!important;transition:none!important}
 .static .slide.active .kb,.static .float,.static .pulse-ring{animation:none!important}
+
+/* ---------- 편집 모드 ---------- */
+#editBtn{position:fixed;right:16px;bottom:14px;z-index:55;border:0;border-radius:20px;background:rgba(255,255,255,.94);color:#163262;
+  font:800 15px "Pretendard Variable",sans-serif;padding:8px 14px;cursor:pointer;opacity:0;transition:opacity .4s;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+body.mouse #editBtn{opacity:.85} #editBtn:hover{opacity:1} .editing #editBtn{display:none}
+#editbar{position:fixed;left:0;right:0;top:0;height:56px;z-index:70;display:none;align-items:center;gap:6px;padding:0 12px;background:#0f1522;color:#fff;
+  font:600 15px "Pretendard Variable",sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.4);overflow-x:auto;white-space:nowrap}
+.editing #editbar{display:flex}
+#editbar .lbl{font-weight:900;color:#ffd23f;margin-right:6px;flex:none}
+#editbar button{flex:none;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:7px 11px;
+  font:700 15px "Pretendard Variable",sans-serif;cursor:pointer}
+#editbar button:hover{background:rgba(255,255,255,.2)}
+#editbar .sep{width:1px;height:26px;background:rgba(255,255,255,.2);margin:0 4px;flex:none}
+#editbar .pgn{min-width:64px;text-align:center;font-variant-numeric:tabular-nums;flex:none}
+#editbar .st{opacity:.75;margin-left:auto;padding:0 8px;flex:none}
+#editbar .save{background:#e3262d;border-color:#e3262d}
+#editbar.dirty .save{box-shadow:0 0 0 3px rgba(255,210,63,.7)}
+#editbar .exit{background:#fff;color:#0f1522}
+.editing #viewport{top:56px}
+.editing #stepdots,.editing #progress{display:none}
+.editing [data-eid]{cursor:text;outline:2px dashed transparent;outline-offset:3px;pointer-events:auto}
+.editing [data-eid]:hover{outline-color:rgba(61,160,255,.85)}
+.editing [data-eid].edited{outline-color:rgba(255,170,0,.95)}
+.editing [data-eid]:focus{outline:3px solid #3da0ff;outline-offset:3px}
+.editing .grain,.editing .sweep,.editing .tint{pointer-events:none}
+.editing .blank{color:var(--yellow)} .editing .blank::after{content:""}
+.editing .qbox .ans{opacity:1;transform:none}
+#toast{position:fixed;left:50%;bottom:40px;transform:translate(-50%,20px);z-index:80;background:#111;color:#fff;font:700 17px "Pretendard Variable",sans-serif;
+  padding:12px 20px;border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:all .3s;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
 <body>
@@ -1053,18 +1083,58 @@ body{font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic
 <tr><td><kbd>F</kbd></td><td>전체 화면</td></tr>
 <tr><td><kbd>M</kbd></td><td>슬라이드 목록</td></tr>
 <tr><td><kbd>Home</kbd> <kbd>End</kbd></td><td>처음 / 마지막</td></tr>
+<tr><td><kbd>E</kbd></td><td>편집 모드 (글자 고치기 · 저장)</td></tr>
 <tr><td><kbd>?</kbd></td><td>이 도움말</td></tr></table>
 <p style="margin-top:20px;font-size:18px;opacity:.7">지도 빈칸·카드·빈칸 문제는 직접 눌러서 공개할 수 있어요.</p></div>
 
+<button id="editBtn" title="편집 모드 (E)">✎ 편집</button>
+<div id="editbar">
+  <span class="lbl">✎ 편집 모드</span>
+  <button data-act="prev" title="이전 슬라이드 (PageUp)">◀</button><span class="pgn"></span><button data-act="next" title="다음 슬라이드 (PageDown)">▶</button>
+  <span class="sep"></span>
+  <button data-act="smaller" title="고른 글상자의 글자를 작게">가−</button><button data-act="bigger" title="고른 글상자의 글자를 크게">가+</button>
+  <button data-act="hl" title="드래그해서 고른 글자에 형광펜">형광펜</button><button data-act="em" title="드래그해서 고른 글자를 강조색으로">강조색</button>
+  <button data-act="reset" title="고른 글상자를 처음 상태로">이 글상자 되돌리기</button>
+  <button data-act="flip" class="flipb" title="카드 앞면/뒷면 바꾸기">카드 뒤집기</button>
+  <span class="st"></span>
+  <button data-act="resetAll" title="고친 내용을 모두 취소">모두 되돌리기</button>
+  <button data-act="save" class="save" title="Ctrl+S">저장</button>
+  <button data-act="exit" class="exit" title="Esc">편집 끝내기</button>
+</div>
+<div id="toast"></div>
+<script id="slide-edits" type="application/json">{}</script>
+
 <script>
 (()=>{
+// 저장할 때 쓸 원본(스크립트가 아무것도 바꾸기 전 상태)
+const PRISTINE='<!doctype html>\n'+document.documentElement.outerHTML;
 const stage=document.getElementById('stage');
 const slides=[...document.querySelectorAll('.slide')];
 const N=slides.length;
+
+// ---------- 고칠 수 있는 글상자 찾기 + 저장된 수정 적용 ----------
+const norm=t=>t.replace(/\s+/g,' ').trim();
+const EXCL='script,style,svg,button,img,.pg,#sortArea,.wall';
+const hasText=el=>[...el.childNodes].some(n=>n.nodeType===3&&/\S/.test(n.nodeValue));
+const editables=[];
+slides.forEach((s,si)=>{let k=0;(function walk(root){for(const c of root.children){if(c.matches(EXCL))continue;
+  if(hasText(c)&&!c.querySelector(EXCL)){const eid=si+'.'+(k++);c.dataset.eid=eid;editables.push({el:c,si,eid,oh:c.innerHTML,ofs:c.style.fontSize,ot:norm(c.textContent)});}
+  else walk(c);}})(s);});
+const byEid=new Map(editables.map(x=>[x.eid,x]));
+function fixCounts(el){[el,...el.querySelectorAll('.count')].forEach(c=>{if(!c.classList.contains('count'))return;
+  const v=norm(c.textContent);if(/^\d+$/.test(v))c.dataset.to=v;else c.classList.remove('count');});}
+let edits={};
+try{edits=JSON.parse(document.getElementById('slide-edits').textContent||'{}')||{};}catch(_){edits={};}
+{const ok={},used=new Set();
+  for(const [eid,r] of Object.entries(edits)){let x=byEid.get(eid);
+    if(!x||x.ot!==r.o)x=editables.find(y=>y.si===+eid.split('.')[0]&&y.ot===r.o&&!used.has(y.eid));
+    if(!x||used.has(x.eid))continue;used.add(x.eid);
+    if(r.h!=null)x.el.innerHTML=r.h;if(r.fs)x.el.style.fontSize=r.fs;fixCounts(x.el);x.el.classList.add('edited');ok[x.eid]=r;}
+  edits=ok;}
 let cur=0, step=0, busy=false;
 const maxStep=s=>Math.max(0,...[...s.querySelectorAll('[data-step]')].map(e=>+e.dataset.step));
 
-function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`scale(${s})`;}
+function fit(){const top=document.body.classList.contains('editing')?56:0;const s=Math.min(innerWidth/1920,(innerHeight-top)/1080);stage.style.transform=`scale(${s})`;}
 addEventListener('resize',fit);fit();
 
 // page numbers
@@ -1118,7 +1188,7 @@ window.__go=go;
 
 // UI
 const prog=document.getElementById('progress'),ctr=document.getElementById('counter'),dots=document.getElementById('stepdots');
-function updateUI(){prog.style.width=((cur+1)/N*100)+'%';ctr.textContent=(cur+1)+' / '+N;
+function updateUI(){if(editing)updateEditUI();prog.style.width=((cur+1)/N*100)+'%';ctr.textContent=(cur+1)+' / '+N;
   const m=maxStep(slides[cur]);dots.innerHTML='';for(let k=1;k<=m;k++){const d=document.createElement('i');if(k<=step)d.className='on';dots.appendChild(d);}
   menuList.querySelectorAll('li').forEach((li,k)=>li.classList.toggle('cur',k===cur));}
 const menu=document.getElementById('menu'),help=document.getElementById('help'),menuList=menu.querySelector('ol');
@@ -1126,8 +1196,18 @@ slides.forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<span
   li.onclick=()=>{menu.classList.remove('open');go(i);};menuList.appendChild(li);});
 
 addEventListener('keydown',e=>{
-  if(e.key==='m'||e.key==='M'){menu.classList.toggle('open');help.classList.remove('open');return;}
-  if(e.key==='?'||e.key==='h'||e.key==='H'){help.classList.toggle('open');menu.classList.remove('open');return;}
+  if(editing){
+    if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();saveFile();return;}
+    if(e.target.isContentEditable){if(e.isComposing)return;
+      if(e.key==='Escape')e.target.blur();else if(e.key==='Enter'){e.preventDefault();document.execCommand('insertLineBreak');}return;}
+    if(e.key==='Escape')setEdit(false);
+    else if(['ArrowRight','PageDown'].includes(e.key)){e.preventDefault();go(cur+1,true);}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(cur-1,true);}
+    return;}
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.code==='KeyE'){menu.classList.remove('open');help.classList.remove('open');setEdit(true);return;}
+  if(e.code==='KeyM'){menu.classList.toggle('open');help.classList.remove('open');return;}
+  if(e.key==='?'||e.code==='KeyH'){help.classList.toggle('open');menu.classList.remove('open');return;}
   if(e.key==='Escape'){menu.classList.remove('open');help.classList.remove('open');return;}
   if(menu.classList.contains('open')||help.classList.contains('open'))return;
   if(['ArrowRight',' ','PageDown','Enter'].includes(e.key)){e.preventDefault();nextStep();}
@@ -1135,16 +1215,15 @@ addEventListener('keydown',e=>{
   else if(e.key==='ArrowDown'){e.preventDefault();go(cur+1);}
   else if(e.key==='ArrowUp'){e.preventDefault();go(cur-1);}
   else if(e.key==='Home')go(0); else if(e.key==='End')go(N-1);
-  else if(e.key==='f'||e.key==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();}
+  else if(e.code==='KeyF'){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();}
 });
-document.getElementById('viewport').addEventListener('click',e=>{if(e.target.closest('.ix,button,a,.flip,.qbox,.blank'))return;nextStep();});
-document.addEventListener('contextmenu',e=>{e.preventDefault();prevStep();});
+document.getElementById('viewport').addEventListener('click',e=>{if(editing||e.target.closest('.ix,button,a,.flip,.qbox,.blank'))return;nextStep();});
+document.addEventListener('contextmenu',e=>{if(editing)return;e.preventDefault();prevStep();});
 
 // map quiz
-document.querySelectorAll('.qbox').forEach(q=>q.addEventListener('click',()=>q.classList.toggle('open')));
+document.addEventListener('click',e=>{const q=e.target.closest('.qbox');if(q){q.classList.toggle('open');return;}const b=e.target.closest('.blank');if(b)b.classList.toggle('shown');});
 window.revealAll=btn=>btn.closest('.slide').querySelectorAll('.qbox').forEach((q,i)=>setTimeout(()=>q.classList.add('open'),i*220));
 // blanks
-document.querySelectorAll('.blank').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('shown')));
 
 // ---------- card sort ----------
 const EVENTS=[
@@ -1188,6 +1267,67 @@ function up(e){const c=drag;drag=null;c.classList.remove('dragging');c.removeEve
   else{c.dataset.slot='';}
   cards.forEach(k=>k.classList.remove('good','bad'));}
 sortReset();
+
+// ---------- 편집 모드 ----------
+let editing=false,dirty=false,curEd=null,fileHandle=null;
+const ebar=document.getElementById('editbar'),toastEl=document.getElementById('toast');
+const EDIT_TAG='<scr'+'ipt id="slide-edits" type="application/json">',END_TAG='</scr'+'ipt>';
+function toast(msg,ms=2600){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>toastEl.classList.remove('show'),ms);}
+function cleanHTML(el){const c=el.cloneNode(true);c.querySelectorAll('.shown,.on,.open,.flipped,.good,.bad').forEach(n=>n.classList.remove('shown','on','open','flipped','good','bad'));
+  c.querySelectorAll('[contenteditable]').forEach(n=>n.removeAttribute('contenteditable'));return c.innerHTML;}
+function record(x){const h=cleanHTML(x.el),fs=x.el.style.fontSize,r={o:x.ot};
+  if(h!==x.oh)r.h=h;if(fs!==x.ofs)r.fs=fs;
+  if(r.h==null&&r.fs==null)delete edits[x.eid];else edits[x.eid]=r;
+  x.el.classList.toggle('edited',!!edits[x.eid]);setDirty(true);}
+function setDirty(v){dirty=v;const n=Object.keys(edits).length;
+  ebar.querySelector('.st').textContent=(n?`고친 글상자 ${n}개`:'고친 곳 없음')+(dirty?' · 저장 안 됨':' · 저장됨');ebar.classList.toggle('dirty',dirty);}
+function updateEditUI(){ebar.querySelector('.pgn').textContent=(cur+1)+' / '+N;ebar.querySelector('.flipb').style.display=slides[cur].querySelector('.flip')?'':'none';}
+function needCur(msg){if(!curEd||!document.body.contains(curEd.el)){toast(msg||'먼저 고칠 글자를 눌러 주세요');return false;}return true;}
+function bump(f){if(!needCur())return;const px=parseFloat(getComputedStyle(curEd.el).fontSize);curEd.el.style.fontSize=Math.max(12,Math.round(px*f))+'px';record(curEd);}
+function isLightText(el){const c=getComputedStyle(el).color.match(/[\d.]+/g).map(Number);return c[0]*.3+c[1]*.59+c[2]*.11>150;}
+function wrap(kind){const sel=getSelection();
+  if(!curEd||!sel.rangeCount||sel.isCollapsed){toast('강조할 글자를 드래그해서 고른 뒤 눌러 주세요');return;}
+  const r=sel.getRangeAt(0);if(!curEd.el.contains(r.commonAncestorContainer)){toast('한 글상자 안에서만 고를 수 있어요');return;}
+  const light=isLightText(curEd.el),sp=document.createElement('span');
+  if(kind==='hl')sp.style.background=`linear-gradient(transparent 58%,${light?'rgba(255,210,63,.5)':'rgba(255,210,63,.8)'} 58%)`;
+  else{sp.style.color=light?'#ffd23f':'#e3262d';sp.style.fontWeight='800';}
+  sp.appendChild(r.extractContents());r.insertNode(sp);sel.removeAllRanges();record(curEd);}
+function restore(x){x.el.innerHTML=x.oh;x.el.style.fontSize=x.ofs;fixCounts(x.el);}
+function resetCur(){if(!needCur('먼저 되돌릴 글상자를 눌러 주세요'))return;restore(curEd);record(curEd);toast('처음 상태로 되돌렸어요');}
+function resetAll(){if(!Object.keys(edits).length){toast('고친 곳이 없어요');return;}
+  if(!confirm('고친 내용을 모두 처음 상태로 되돌릴까요?'))return;
+  editables.forEach(x=>{if(edits[x.eid]){restore(x);x.el.classList.remove('edited');}});edits={};setDirty(true);toast('모두 되돌렸어요. [저장]을 눌러야 파일에 반영돼요',3600);}
+function buildHTML(){const i=PRISTINE.indexOf(EDIT_TAG),j=PRISTINE.indexOf(END_TAG,i);
+  return PRISTINE.slice(0,i+EDIT_TAG.length)+JSON.stringify(edits).replace(/</g,'\\u003c')+PRISTINE.slice(j);}
+async function saveFile(){const html=buildHTML(),blob=new Blob([html],{type:'text/html'});
+  const name=decodeURIComponent(location.pathname.split('/').pop()||'')||'냉전과 제3 세계.html';
+  if(window.showSaveFilePicker){
+    try{if(!fileHandle)fileHandle=await showSaveFilePicker({suggestedName:name,types:[{description:'HTML 파일',accept:{'text/html':['.html']}}]});
+      const w=await fileHandle.createWritable();await w.write(blob);await w.close();setDirty(false);toast('저장했어요 ✔ '+fileHandle.name);return;}
+    catch(err){if(err&&err.name==='AbortError')return;fileHandle=null;}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);setDirty(false);toast('수정된 파일을 내려받았어요. 다운로드 폴더의 새 파일을 쓰세요',4500);}
+function setEdit(on){if(on===editing)return;editing=on;document.body.classList.toggle('editing',on);
+  editables.forEach(x=>{if(on){x.el.contentEditable='true';x.el.spellcheck=false;}else x.el.removeAttribute('contenteditable');});
+  if(on){document.body.classList.add('static');}
+  else{const a=document.activeElement;if(a&&a.isContentEditable)a.blur();curEd=null;
+    slides.forEach(s=>s.querySelectorAll('.flip.flipped').forEach(f=>f.classList.remove('flipped')));
+    if(!params.has('static'))document.body.classList.remove('static');}
+  fit();activate(cur,1,maxStep(slides[cur]));
+  if(on){setDirty(dirty);toast('글자를 눌러서 고치세요 · 다 고치면 [저장]',3000);}}
+document.addEventListener('click',e=>{if(editing&&!e.target.closest('#editbar')&&e.target.closest('.flip,.qbox,.blank,.scard'))e.stopPropagation();},true);
+document.addEventListener('focusin',e=>{const el=editing&&e.target.closest&&e.target.closest('[data-eid]');if(el)curEd=byEid.get(el.dataset.eid);});
+document.addEventListener('input',e=>{const el=editing&&e.target.closest&&e.target.closest('[data-eid]');if(el)record(byEid.get(el.dataset.eid));});
+document.addEventListener('paste',e=>{if(!editing||!e.target.closest||!e.target.closest('[data-eid]'))return;e.preventDefault();
+  document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text/plain'));});
+ebar.addEventListener('mousedown',e=>{if(e.target.closest('button'))e.preventDefault();});
+ebar.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  ({prev:()=>go(cur-1,true),next:()=>go(cur+1,true),smaller:()=>bump(1/1.08),bigger:()=>bump(1.08),hl:()=>wrap('hl'),em:()=>wrap('em'),
+    reset:resetCur,resetAll,flip:()=>slides[cur].querySelectorAll('.flip').forEach(f=>f.classList.toggle('flipped')),
+    save:saveFile,exit:()=>setEdit(false)})[b.dataset.act]?.();});
+document.getElementById('editBtn').addEventListener('click',()=>setEdit(true));
+addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+{let mt;addEventListener('mousemove',()=>{document.body.classList.add('mouse');clearTimeout(mt);mt=setTimeout(()=>document.body.classList.remove('mouse'),2500);});}
 
 // start
 const params=new URLSearchParams(location.search);

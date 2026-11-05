@@ -35,8 +35,17 @@ def embed_font(html: str) -> str:
         print("font: fontTools 미설치 → CDN 사용 (pip install fonttools brotli)")
         return html
 
-    # 소스에 나오는 모든 글자 + 기본 ASCII
-    chars = set(html) | {chr(c) for c in range(0x20, 0x7F)}
+    # 소스에 나오는 글자 + 편집 모드에서 새로 칠 글자(자주 쓰는 한글 2350자, 기호)
+    chars = set(html)
+    for lo, hi in [(0x20, 0x7F), (0xA0, 0x100), (0x2000, 0x2070), (0x2190, 0x2200),
+                   (0x2460, 0x2500), (0x25A0, 0x2600), (0x3000, 0x3040), (0x3131, 0x318F)]:
+        chars |= {chr(c) for c in range(lo, hi)}
+    for a in range(0xB0, 0xC9):  # KS X 1001 완성형 한글
+        for b in range(0xA1, 0xFF):
+            try:
+                chars.add(bytes([a, b]).decode("euc-kr"))
+            except UnicodeDecodeError:
+                pass
     text = "".join(sorted(c for c in chars if ord(c) >= 0x20))
 
     font = TTFont(str(FONT))
