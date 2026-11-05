@@ -178,6 +178,21 @@ body{font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic
 .static *,.static *::before,.static *::after{animation-duration:0s!important;animation-delay:0s!important;transition:none!important}
 .static .slide.active .kb,.static .float,.static .pulse-ring{animation:none!important}
 
+/* ---------- 영상 ---------- */
+.vbox{position:absolute;left:160px;top:128px;width:1600px;height:900px;background:#000;border-radius:8px;overflow:hidden;overflow:clip;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.vbox video{width:100%;height:100%;object-fit:contain;display:block;background:#000}
+.vplay{position:absolute;inset:0;border:0;background:rgba(0,0,0,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  cursor:pointer;color:#fff;font:800 36px "Pretendard Variable",sans-serif;transition:opacity .3s}
+.vplay svg{filter:drop-shadow(0 10px 30px rgba(0,0,0,.5))}
+.slide.active .vplay svg{animation:vpulse 2s 1s ease-in-out infinite}
+@keyframes vpulse{50%{transform:scale(1.08)}}
+.vbox.started .vplay{opacity:0;pointer-events:none}
+.vmsg{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center;color:#fff;background:#14171d}
+.vmsg b{font-size:52px;font-weight:900;color:var(--yellow)}
+.vmsg span{font-size:36px;line-height:1.55;opacity:.92}
+.vmsg em{font-style:normal;font-weight:900;background:rgba(255,255,255,.16);padding:0 10px;border-radius:6px}
+.vbox.missing .vmsg{display:flex} .vbox.missing .vplay{display:none}
+
 /* ---------- 편집 모드 ---------- */
 #editBtn{position:fixed;right:16px;bottom:14px;z-index:55;border:0;border-radius:20px;background:rgba(255,255,255,.94);color:#163262;
   font:800 15px "Pretendard Variable",sans-serif;padding:8px 14px;cursor:pointer;opacity:0;transition:opacity .4s;box-shadow:0 4px 14px rgba(0,0,0,.3)}
@@ -489,6 +504,16 @@ body.mouse #editBtn{opacity:.85} #editBtn:hover{opacity:1} .editing #editBtn{dis
   </style>
 </section>
 
+<!-- ============ 영상 1 ============ -->
+<section class="slide dark" data-title="영상 1" style="background:#05070d">
+  <header class="hdr"><span class="tag">VIDEO</span><span class="ttl">영상 1</span><span class="pg"></span></header>
+  <div class="vbox ix a" style="--anim:zoom;--d:.15s">
+    <video src="영상/1.mp4#t=0.1" preload="metadata" playsinline></video>
+    <button class="vplay" aria-label="영상 재생"><svg viewBox="0 0 120 120" width="170" height="170"><circle cx="60" cy="60" r="56" fill="#e3262d"/><path d="M48 35L88 60L48 85Z" fill="#fff"/></svg>눌러서 재생</button>
+    <div class="vmsg"><b>영상을 열 수 없어요</b><span>이 HTML 파일이 있는 곳에 <em>영상</em> 폴더가 있고,<br>그 안에 <em>1.mp4</em> 파일이 있는지 확인해 주세요.</span></div>
+  </div>
+</section>
+
 <!-- ============ 10. 냉전 속 열전 ============ -->
 <section class="slide" data-title="냉전 속 열전">
   <div style="position:absolute;left:0;right:0;top:0;height:600px;overflow:hidden;overflow:clip">
@@ -564,7 +589,7 @@ body.mouse #editBtn{opacity:.85} #editBtn:hover{opacity:1} .editing #editBtn{dis
   <div class="mapq ix a" style="--anim:zoom;--d:.3s">
     <img src="{{img:world_map_blank}}" alt="냉전 시기 세계 지도(빈칸)">
     <div class="qbox" style="left:3.82%;top:4.4%;width:12.74%;height:12.51%"><i class="pulse-ring"></i><span>1</span><div class="ans"><b>베를린 봉쇄</b><em>1948~1949</em></div></div>
-    <div class="qbox" style="left:27.75%;top:3.88%;width:15.74%;height:12.33%"><i class="pulse-ring"></i><span>2</span><div class="ans"><b>중화 인민 공화국 수립</b><em>1949</em></div></div>
+    <div class="qbox" style="left:27.75%;top:3.88%;width:16.33%;height:12.33%"><i class="pulse-ring"></i><span>2</span><div class="ans"><b>중화 인민 공화국 수립</b><em>1949</em></div></div>
     <div class="qbox hot" style="left:49.13%;top:36.64%;width:12.56%;height:12.33%"><i class="pulse-ring"></i><span>3</span><div class="ans"><b>6·25 전쟁</b><em>1950~1953</em></div></div>
     <div class="qbox hot" style="left:44.03%;top:51.08%;width:12.37%;height:11.98%"><i class="pulse-ring"></i><span>4</span><div class="ans"><b>베트남 전쟁</b><em>1964~1975</em></div></div>
     <div class="qbox" style="left:68.42%;top:64.82%;width:16.01%;height:12.33%"><i class="pulse-ring"></i><span>5</span><div class="ans"><b>쿠바 미사일 위기</b><em>1962</em></div></div>
@@ -922,6 +947,26 @@ body.mouse #editBtn{opacity:.85} #editBtn:hover{opacity:1} .editing #editBtn{dis
   </style>
 </section>
 
+<!-- ============ 영상 2 ============ -->
+<section class="slide dark" data-title="영상 2" style="background:#05070d">
+  <header class="hdr"><span class="tag">VIDEO</span><span class="ttl">영상 2</span><span class="pg"></span></header>
+  <div class="vbox ix a" style="--anim:zoom;--d:.15s">
+    <video src="영상/2.mp4#t=0.1" preload="metadata" playsinline></video>
+    <button class="vplay" aria-label="영상 재생"><svg viewBox="0 0 120 120" width="170" height="170"><circle cx="60" cy="60" r="56" fill="#e3262d"/><path d="M48 35L88 60L48 85Z" fill="#fff"/></svg>눌러서 재생</button>
+    <div class="vmsg"><b>영상을 열 수 없어요</b><span>이 HTML 파일이 있는 곳에 <em>영상</em> 폴더가 있고,<br>그 안에 <em>2.mp4</em> 파일이 있는지 확인해 주세요.</span></div>
+  </div>
+</section>
+
+<!-- ============ 영상 3 ============ -->
+<section class="slide dark" data-title="영상 3" style="background:#05070d">
+  <header class="hdr"><span class="tag">VIDEO</span><span class="ttl">영상 3</span><span class="pg"></span></header>
+  <div class="vbox ix a" style="--anim:zoom;--d:.15s">
+    <video src="영상/3.mp4#t=0.1" preload="metadata" playsinline></video>
+    <button class="vplay" aria-label="영상 재생"><svg viewBox="0 0 120 120" width="170" height="170"><circle cx="60" cy="60" r="56" fill="#e3262d"/><path d="M48 35L88 60L48 85Z" fill="#fff"/></svg>눌러서 재생</button>
+    <div class="vmsg"><b>영상을 열 수 없어요</b><span>이 HTML 파일이 있는 곳에 <em>영상</em> 폴더가 있고,<br>그 안에 <em>3.mp4</em> 파일이 있는지 확인해 주세요.</span></div>
+  </div>
+</section>
+
 <!-- ============ 26. 중국의 변화 ============ -->
 <section class="slide" data-title="중국의 변화">
   <header class="hdr"><span class="tag">PART 3</span><span class="ttl">냉전의 완화와 해체</span><span class="pg"></span></header>
@@ -1082,6 +1127,7 @@ body.mouse #editBtn{opacity:.85} #editBtn:hover{opacity:1} .editing #editBtn{dis
 <tr><td><kbd>F</kbd></td><td>전체 화면</td></tr>
 <tr><td><kbd>M</kbd></td><td>슬라이드 목록</td></tr>
 <tr><td><kbd>Home</kbd> <kbd>End</kbd></td><td>처음 / 마지막</td></tr>
+<tr><td><kbd>Space</kbd> <kbd>K</kbd></td><td>영상 슬라이드에서 재생 / 일시정지</td></tr>
 <tr><td><kbd>E</kbd></td><td>편집 모드 (글자 고치기 · 저장)</td></tr>
 <tr><td><kbd>?</kbd></td><td>이 도움말</td></tr></table>
 <p style="margin-top:20px;font-size:18px;opacity:.7">지도 빈칸·카드·빈칸 문제는 직접 눌러서 공개할 수 있어요.</p></div>
@@ -1113,7 +1159,7 @@ const N=slides.length;
 
 // ---------- 고칠 수 있는 글상자 찾기 + 저장된 수정 적용 ----------
 const norm=t=>t.replace(/\s+/g,' ').trim();
-const EXCL='script,style,svg,button,img,.pg,#sortArea,.wall';
+const EXCL='script,style,svg,button,img,video,.pg,#sortArea,.wall';
 const hasText=el=>[...el.childNodes].some(n=>n.nodeType===3&&/\S/.test(n.nodeValue));
 const editables=[];
 slides.forEach((s,si)=>{let k=0;(function walk(root){for(const c of root.children){if(c.matches(EXCL))continue;
@@ -1126,7 +1172,7 @@ let edits={};
 try{edits=JSON.parse(document.getElementById('slide-edits').textContent||'{}')||{};}catch(_){edits={};}
 {const ok={},used=new Set();
   for(const [eid,r] of Object.entries(edits)){let x=byEid.get(eid);
-    if(!x||x.ot!==r.o)x=editables.find(y=>y.si===+eid.split('.')[0]&&y.ot===r.o&&!used.has(y.eid));
+    if(!x||x.ot!==r.o){const si=+eid.split('.')[0];x=editables.filter(y=>y.ot===r.o&&!used.has(y.eid)).sort((a,b)=>Math.abs(a.si-si)-Math.abs(b.si-si))[0];}
     if(!x||used.has(x.eid))continue;used.add(x.eid);
     if(r.h!=null)x.el.innerHTML=r.h;if(r.fs)x.el.style.fontSize=r.fs;fixCounts(x.el);x.el.classList.add('edited');ok[x.eid]=r;}
   edits=ok;}
@@ -1173,6 +1219,11 @@ function activate(i,dir,stepTo){
   const t=next.dataset.trans||(dir<0?'prev':'next');
   next.classList.add('active','in-'+(t==='zoom'&&dir<0?'prev':t));
   cur=i; step=0;
+  if(prev!==next)prev.querySelectorAll('video').forEach(v=>v.pause());
+  next.querySelectorAll('.qbox.open').forEach(q=>q.classList.remove('open'));
+  next.querySelectorAll('.blank.shown').forEach(b=>b.classList.remove('shown'));
+  next.querySelectorAll('.flip.flipped').forEach(f=>f.classList.remove('flipped'));
+  next.querySelectorAll('.vbox').forEach(resetVideo);
   next.querySelectorAll('[data-step]').forEach(e=>e.classList.remove('on'));
   next.querySelectorAll('.count').forEach(c=>{if(!c.closest('[data-step]'))runCount(c,700);});
   if(next.querySelector('#sortArea')&&!stepTo)sortReset();
@@ -1209,6 +1260,7 @@ addEventListener('keydown',e=>{
   if(e.key==='?'||e.code==='KeyH'){help.classList.toggle('open');menu.classList.remove('open');return;}
   if(e.key==='Escape'){menu.classList.remove('open');help.classList.remove('open');return;}
   if(menu.classList.contains('open')||help.classList.contains('open'))return;
+  if((e.key===' '||e.code==='KeyK')&&toggleVideo()){e.preventDefault();return;}
   if(['ArrowRight',' ','PageDown','Enter'].includes(e.key)){e.preventDefault();nextStep();}
   else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();prevStep();}
   else if(e.key==='ArrowDown'){e.preventDefault();go(cur+1);}
@@ -1266,6 +1318,16 @@ function up(e){const c=drag;drag=null;c.classList.remove('dragging');c.removeEve
   else{c.dataset.slot='';}
   cards.forEach(k=>k.classList.remove('good','bad'));}
 sortReset();
+
+// ---------- 영상 ----------
+function resetVideo(box){const v=box.querySelector('video');v.pause();try{v.currentTime=0.1;}catch(_){}v.controls=false;box.classList.remove('started');}
+function playVideo(box){if(box.classList.contains('missing'))return;const v=box.querySelector('video');v.controls=true;box.classList.add('started');const pr=v.play();if(pr)pr.catch(()=>{});}
+function toggleVideo(){const box=slides[cur].querySelector('.vbox');if(!box||box.classList.contains('missing'))return false;
+  const v=box.querySelector('video');if(v.paused)playVideo(box);else v.pause();return true;}
+document.querySelectorAll('.vbox').forEach(box=>{const v=box.querySelector('video');
+  v.addEventListener('error',()=>box.classList.add('missing'));
+  v.addEventListener('play',()=>{box.classList.add('started');v.controls=true;});
+  box.querySelector('.vplay').addEventListener('click',e=>{e.stopPropagation();if(!editing)playVideo(box);});});
 
 // ---------- 편집 모드 ----------
 let editing=false,dirty=false,curEd=null,fileHandle=null;
