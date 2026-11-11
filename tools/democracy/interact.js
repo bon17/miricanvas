@@ -235,8 +235,17 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
   const expectPart = (k) => k <= 3 ? 'intro' : k <= N(31) ? 's1' : k <= N(47) ? 's2' : k <= N(70) ? 's3' : 'outro';
   ok(facts.parts.every((p, i) => p === expectPart(i + 1)), '모든 장의 data-part가 구간과 일치');
 
-  // 전체 화면 키 (헤드리스에서는 실제로 바뀌지 않아도 오류가 없어야 한다)
-  await press('KeyF'); await page.waitForTimeout(100);
+  // 전체 화면 키: 전체 화면이 되면 마우스를 움직여도 편집 버튼이 나오지 않는다
+  const editBtnVisible = () => page.evaluate(() => { const b = document.getElementById('edit-btn'); return getComputedStyle(b).display !== 'none' && getComputedStyle(b).opacity !== '0'; });
+  await page.mouse.move(300, 300); await page.mouse.move(340, 330); await page.waitForTimeout(400);
+  ok(await editBtnVisible(), '창 화면: 마우스를 움직이면 편집 버튼이 보임');
+  await press('KeyF'); await page.waitForTimeout(400);
+  const isFull = await page.evaluate(() => !!document.fullscreenElement);
+  await page.mouse.move(500, 400); await page.mouse.move(540, 430); await page.waitForTimeout(400);
+  ok(isFull && !(await editBtnVisible()), 'F 전체 화면: 마우스를 움직여도 편집 버튼 없음');
+  await press('KeyF'); await page.waitForTimeout(400);
+  await page.mouse.move(300, 300); await page.mouse.move(340, 330); await page.waitForTimeout(400);
+  ok(!(await page.evaluate(() => !!document.fullscreenElement)) && await editBtnVisible(), 'F 다시: 창 화면으로 돌아오면 편집 버튼이 다시 보임');
 
   // 한글 입력 상태에서도 글자 키 동작 (e.code 사용)
   await goto(N(20));
