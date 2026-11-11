@@ -1,3 +1,6 @@
 # 교과서 이미지(저작권)와 이미지가 포함된 빌드 결과는 공개 저장소에 올리지 않는다
 slides/assets/
 slides/dist/
+# 민주주의와 인권 수업: 교사가 넣는 사진(교과서 이미지)은 올리지 않는다
+democracy/images/*
+!democracy/images/README.txt
