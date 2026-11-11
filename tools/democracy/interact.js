@@ -28,8 +28,8 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
   const cur = () => page.evaluate(() => Number(document.querySelector('#deck > .slide.active').getAttribute('data-n')));
   const press = async (k) => { await page.keyboard.press(k); await page.waitForTimeout(60); };
   const goto = async (n) => { await page.evaluate((x) => { location.hash = '#' + x; }, n); await page.waitForTimeout(80); };
-  const shown = (sel) => page.evaluate((s) => { const el = document.querySelector('.slide.active ' + s); return !!el && el.classList.contains('shown'); }, sel);
-  const stepFlag = () => page.evaluate(() => getComputedStyle(document.getElementById('stepflag')).display !== 'none');
+  const shown = (sel) => page.evaluate((s) => { const el = document.querySelector('.slide.active ' + s); return !!el && el.classList.contains('se-on'); }, sel);
+  const stepFlag = () => page.evaluate(() => !!document.querySelector('.se-num .se-stepflag'));
 
   ok(await cur() === 1, '처음 열면 1장');
   ok(await page.evaluate(() => document.querySelectorAll('#deck > section.slide').length) === TOTAL, `${TOTAL}장`);
@@ -88,7 +88,7 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
 
   // 선택 장 건너뛰기 (단계가 있는 장은 단계까지 넘기며 끝까지)
   await press('Home'); await press('KeyS');
-  ok(await page.evaluate(() => getComputedStyle(document.getElementById('skipflag')).display !== 'none'), 'S: "선택 장 건너뜀" 표시');
+  ok(await page.evaluate(() => SE.skipHidden()), 'S: 선택 장 건너뛰기 켜짐');
   const visited = new Set([await cur()]);
   for (let i = 0; i < 200 && (await cur()) !== TOTAL; i++) { await press('ArrowRight'); visited.add(await cur()); }
   const skipped = Array.from({ length: TOTAL }, (_, i) => i + 1).filter((n) => !visited.has(n));
@@ -102,31 +102,32 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
 
   // 메모
   await goto(5); await press('KeyN');
-  const notes = await page.evaluate(() => ({ vis: getComputedStyle(document.getElementById('notes-panel')).display, text: document.getElementById('notes-body').textContent }));
-  ok(notes.vis === 'block' && notes.text.includes('잠시 뒤 연설문에서'), 'N: 05번 메모 보임');
+  const notes = await page.evaluate(() => ({ vis: !document.querySelector('.se-notes').hidden, text: document.querySelector('.se-notes-b').textContent }));
+  ok(notes.vis && notes.text.includes('잠시 뒤 연설문에서'), 'N: 05번 메모 보임');
   await press('ArrowRight');
-  ok((await page.evaluate(() => document.getElementById('notes-body').textContent)).includes('링컨'), '메모가 장을 따라 바뀜');
+  ok((await page.evaluate(() => document.querySelector('.se-notes-b').textContent)).includes('링컨'), '메모가 장을 따라 바뀜');
   await press('KeyN');
-  ok(await page.evaluate(() => getComputedStyle(document.getElementById('notes-panel')).display === 'none'), 'N 다시: 메모 숨김');
+  ok(await page.evaluate(() => document.querySelector('.se-notes').hidden), 'N 다시: 메모 숨김');
 
   // 전체 목록
   await press('KeyO');
-  const ov = await page.evaluate(() => ({ vis: getComputedStyle(document.getElementById('overview')).display, n: document.querySelectorAll('.ov-item').length, opt: [...document.querySelectorAll('.ov-item.opt')].map((b) => +b.dataset.i + 1), op: getComputedStyle(document.querySelector('.ov-item.opt')).opacity }));
-  ok(ov.vis === 'block' && ov.n === TOTAL, `O: ${TOTAL}장 목록`);
+  await page.waitForTimeout(300);
+  const ov = await page.evaluate(() => ({ vis: !!document.querySelector('.se-grid'), n: document.querySelectorAll('.se-grid-i').length, opt: [...document.querySelectorAll('.se-grid-i.hid')].map((b) => +b.dataset.i + 1), op: getComputedStyle(document.querySelector('.se-grid-i.hid .se-thumb') || document.body).opacity }));
+  ok(ov.vis && ov.n === TOTAL, `O: ${TOTAL}장 목록`);
   ok(JSON.stringify(ov.opt) === JSON.stringify(OPTIONAL) && Number(ov.op) < 0.5, '목록에서 선택 장 흐림');
   await press('ArrowRight');
   ok(await cur() === 6, '목록이 열려 있으면 방향키 무시');
-  await page.locator('.ov-item[data-i="9"]').click();
-  ok(await cur() === 10 && await page.evaluate(() => getComputedStyle(document.getElementById('overview')).display === 'none'), '목록에서 10번 누르면 이동하고 닫힘');
+  await page.locator('.se-grid-i[data-i="9"]').click(); await page.waitForTimeout(900);
+  ok(await cur() === 10 && await page.evaluate(() => !document.querySelector('.se-grid')), '목록에서 10번 누르면 이동하고 닫힘');
   await press('KeyO'); await press('Escape');
-  ok(await page.evaluate(() => getComputedStyle(document.getElementById('overview')).display === 'none'), 'Esc로 목록 닫힘');
+  ok(await page.evaluate(() => !document.querySelector('.se-grid')), 'Esc로 목록 닫힘');
 
   // 마우스 클릭
-  await page.mouse.click(1280 * 0.8, 360); await page.waitForTimeout(80);
+  await page.mouse.click(1280 * 0.8, 360); await page.waitForTimeout(900);
   ok(await cur() === 11, '오른쪽 2/3 클릭 → 다음');
-  await page.mouse.click(1280 * 0.2, 360); await page.waitForTimeout(80);
+  await page.mouse.click(1280 * 0.2, 360); await page.waitForTimeout(900);
   ok(await cur() === 10, '왼쪽 1/3 클릭 → 이전');
-  await page.mouse.click(1280 * 0.4, 360); await page.waitForTimeout(80);
+  await page.mouse.click(1280 * 0.4, 360); await page.waitForTimeout(900);
   ok(await cur() === 11, '가운데(1/3~2/3) 클릭 → 다음');
 
   // 비교 슬라이더: 마우스
@@ -179,19 +180,21 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
   }
   ok(noAnim.length === 0, `움직임: ${TOTAL}장 모두 들어올 때 애니메이션이 돈다` + (noAnim.length ? ' → 없음: ' + noAnim.join(',') : ''));
   await goto(N(30)); await page.waitForTimeout(200); await press('ArrowRight');
-  const wipe = await page.evaluate(() => [...document.querySelectorAll('#deck > .slide')].map((s) => s.className).filter((c) => /enter-|leave-/.test(c)).join(' | '));
-  ok(/enter-next/.test(wipe) && /leave-next/.test(wipe), '같은 이야기 안에서는 닦아 내는 장 전환 → ' + wipe);
+  const wipe = await page.evaluate(() => { const a = document.querySelector('#deck > .slide.active'); return { leaving: !!document.querySelector('#deck > .slide.leaving'), clip: a.getAnimations().some((x) => x.effect.getKeyframes().some((k) => k.clipPath)) }; });
+  ok(wipe.leaving && wipe.clip, '같은 이야기 안에서는 닦아 내는 장 전환 → ' + JSON.stringify(wipe));
   await page.waitForTimeout(1100); await press('ArrowRight');
   const sw = await page.evaluate(() => ({ go: document.getElementById('sweep').classList.contains('go'), text: document.getElementById('sweep').textContent }));
   ok(sw.go && sw.text === '노동', `이야기가 바뀌면(${N(31)}→${N(32)}) 색 띠가 지나감 → ` + sw.text);
   await page.waitForTimeout(1100);
-  await press('KeyM');
-  const off = await page.evaluate(() => ({ flag: getComputedStyle(document.getElementById('motionflag')).display, motion: document.getElementById('stage').classList.contains('motion') }));
+  await press('KeyM'); await press('KeyM');
+  const off = await page.evaluate(() => ({ level: SE.settings.motion, motion: document.getElementById('stage').classList.contains('motion') }));
   await press('ArrowRight'); await page.waitForTimeout(50);
-  const offAnims = await page.evaluate(() => document.getAnimations().map((a) => (a.animationName || a.transitionProperty) + '@' + (a.effect.target.id || a.effect.target.className)));
-  ok(off.flag !== 'none' && !off.motion && offAnims.length === 0, 'M: 움직임 끄면 애니메이션 없음, "움직임 끔" 표시 → ' + JSON.stringify({ flag: off.flag, motion: off.motion, offAnims }));
+  const offAnims = await page.evaluate(() => document.getAnimations().filter((a) => a.effect && a.effect.target && a.effect.target.closest && a.effect.target.closest('#stage')).map((a) => (a.animationName || a.transitionProperty) + '@' + (a.effect.target.id || a.effect.target.className)));
+  ok(off.level === 0 && !off.motion && offAnims.length === 0, 'M 두 번(기본→화려→끄기): 움직임 없음 → ' + JSON.stringify({ off, offAnims }));
   await press('KeyM');
-  ok(await page.evaluate(() => document.getElementById('stage').classList.contains('motion')), 'M 다시: 움직임 켜짐');
+  ok(await page.evaluate(() => document.getElementById('stage').classList.contains('se-calm')), 'M: 차분');
+  await press('KeyM');
+  ok(await page.evaluate(() => SE.settings.motion === 2 && document.getElementById('stage').classList.contains('motion')), 'M: 다시 기본');
 
   // 장마다 구성
   const facts = await page.evaluate(([n]) => {
@@ -242,70 +245,76 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
   const expectPart = (k) => k <= 3 ? 'intro' : k <= N(31) ? 's1' : k <= N(47) ? 's2' : k <= N(70) ? 's3' : 'outro';
   ok(facts.parts.every((p, i) => p === expectPart(i + 1)), '모든 장의 data-part가 구간과 일치');
 
-  // 전체 화면 키: 전체 화면이 되면 마우스를 움직여도 편집 버튼이 나오지 않는다
-  const editBtnVisible = () => page.evaluate(() => { const b = document.getElementById('edit-btn'); return getComputedStyle(b).display !== 'none' && getComputedStyle(b).opacity !== '0'; });
+  // 전체 화면: 슬라이드와 쪽 번호만. 구석 단추는 숨고 가장자리에 마우스를 대면 잠깐 나타난다
+  const puckShown = () => page.evaluate(() => getComputedStyle(document.querySelector('.se-puck')).opacity !== '0');
   await page.mouse.move(300, 300); await page.mouse.move(340, 330); await page.waitForTimeout(400);
-  ok(await editBtnVisible(), '창 화면: 마우스를 움직이면 편집 버튼이 보임');
+  ok(await puckShown(), '창 화면: 구석 단추가 보임');
   await press('KeyF'); await page.waitForTimeout(400);
   const isFull = await page.evaluate(() => !!document.fullscreenElement);
   await page.mouse.move(500, 400); await page.mouse.move(540, 430); await page.waitForTimeout(400);
-  ok(isFull && !(await editBtnVisible()), 'F 전체 화면: 마우스를 움직여도 편집 버튼 없음');
+  ok(isFull && !(await puckShown()), 'F 전체 화면: 마우스를 움직여도 도구 없음 (편집 단추도 없음)');
+  ok(await page.evaluate(() => getComputedStyle(document.querySelector('.se-num')).display !== 'none'), '전체 화면에서도 쪽 번호는 보임');
   await press('KeyF'); await page.waitForTimeout(400);
   await page.mouse.move(300, 300); await page.mouse.move(340, 330); await page.waitForTimeout(400);
-  ok(!(await page.evaluate(() => !!document.fullscreenElement)) && await editBtnVisible(), 'F 다시: 창 화면으로 돌아오면 편집 버튼이 다시 보임');
+  ok(!(await page.evaluate(() => !!document.fullscreenElement)) && await puckShown(), 'F 다시: 창 화면으로 돌아오면 단추가 다시 보임');
 
   // 한글 입력 상태에서도 글자 키 동작 (e.code 사용)
   await goto(N(20));
   await page.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ㅜ', code: 'KeyN', bubbles: true })));
-  ok(await page.evaluate(() => getComputedStyle(document.getElementById('notes-panel')).display === 'block'), '한글 자판 상태(ㅜ)에서도 N 동작');
+  ok(await page.evaluate(() => !document.querySelector('.se-notes').hidden), '한글 자판 상태(ㅜ)에서도 N 동작');
   await page.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Process', code: 'KeyN', bubbles: true })));
 
   // 편집 모드: 고치고 저장한 파일을 다시 열어 확인
-  await goto(12);
+  await goto(12); await page.waitForTimeout(1200);
   await page.evaluate(() => { window.showSaveFilePicker = undefined; });
-  await press('KeyE');
-  const ed = await page.evaluate(() => ({ on: document.body.classList.contains('editing'), n: document.querySelectorAll('#deck [contenteditable="true"]').length, bar: getComputedStyle(document.getElementById('edit-bar')).display }));
-  ok(ed.on && ed.n > 300 && ed.bar !== 'none', `E: 편집 모드, 고칠 수 있는 글자 ${ed.n}곳, 편집 도구 막대`);
-  const lk2 = await leaked();
-  ok(lk2.length === 0, '편집 모드에서도 다른 장의 답 · 패턴 칸이 겹쳐 보이지 않음' + (lk2.length ? ' → ' + lk2.join(' | ') : ''));
-  await page.locator('.slide.active .headline').click();
-  await page.keyboard.press('End'); await page.keyboard.type('(고침)');
-  await press('Escape');
-  await goto(N(31));
-  const cellText = await page.evaluate(() => { const td = document.querySelector('.slide.active tbody tr td:nth-child(2)'); td.focus(); return td.textContent; });
-  await page.keyboard.press('End'); await page.keyboard.type('★');
+  await press('KeyE'); await page.waitForTimeout(300);
+  ok(await page.evaluate(() => document.body.classList.contains('se-editing') && !document.querySelector('.se-film').hidden), 'E: 편집 모드, 아래에 장 목록');
+  const hl = await page.evaluate(() => { const r = document.querySelector('.slide.active .headline').getBoundingClientRect(); return { x: r.right - 20, y: r.top + r.height / 2 }; });
+  await page.mouse.click(hl.x, hl.y);
+  ok(await page.evaluate(() => SE.edit.selection()[0] && SE.edit.selection()[0].classList.contains('headline')), '12번 큰 제목을 누르면 선택');
+  await page.mouse.dblclick(hl.x, hl.y); await page.waitForTimeout(150);
+  await page.keyboard.press('End'); await page.keyboard.type('(고침)'); await press('Escape');
+  ok(await page.evaluate(() => /\(고침\)$/.test(document.querySelector('.slide.active .headline').textContent)), '두 번 눌러 글자 고치기');
+  await goto(N(31)); await page.waitForTimeout(200);
+  const cellPt = await page.evaluate(() => { const td = document.querySelector('.slide.active tbody tr td:nth-child(2)'); const r = td.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, t: td.textContent }; });
+  await page.mouse.dblclick(cellPt.x, cellPt.y); await page.waitForTimeout(150);
+  await page.keyboard.press('End'); await page.keyboard.type('★'); await press('Escape');
   const synced = await page.evaluate(([a]) => document.querySelectorAll('#deck > .slide')[a - 1].querySelector('tbody tr td:nth-child(2)').textContent, [N(71)]);
-  ok(synced === cellText + '★', `정리표 칸을 고치면 다른 정리표 장(${N(71)})에도 바로 반영`);
-  await press('Escape');
-  ok(/고친 곳 2개/.test(await page.evaluate(() => document.getElementById('edit-count').textContent)), '고친 곳 2개로 표시');
+  ok(synced === cellPt.t + '★', `정리표 칸을 고치면 다른 정리표 장(${N(71)})에도 바로 반영 → ` + synced);
+  await page.mouse.click(cellPt.x, cellPt.y);
+  ok(await page.evaluate(() => /글자만/.test(document.querySelector('.se-pill').textContent)), '정리표 칸은 글자만 고칠 수 있다고 알려 줌');
+  await goto(9); await page.waitForTimeout(200);
+  const sp = await page.evaluate(() => { const r = document.querySelector('.slide.active .source-box').getBoundingClientRect(); return { x: r.left + 40, y: r.top + 40 }; });
+  await page.mouse.dblclick(sp.x, sp.y); await page.waitForTimeout(200);
+  ok(await page.evaluate(() => !document.querySelector('[contenteditable]') && /08번/.test([...document.querySelectorAll('.se-toast')].map((t) => t.textContent).join(' '))), '09번 연설문은 08번에서 고치라고 알려 줌');
   const [dl] = await Promise.all([page.waitForEvent('download'), page.keyboard.press('Control+s')]);
   const saved = path.join(os.tmpdir(), 'democracy-saved-' + process.pid + '.html');
   await dl.saveAs(saved);
   const html = fs.readFileSync(saved, 'utf8');
-  ok(html.startsWith('<!doctype html>') && html.length > 100000, 'Ctrl+S: HTML 파일로 저장');
+  const markup = html.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style[\s\S]*?<\/style>/g, '');
+  const leftover = markup.match(/data-se-rt|contenteditable|class="[^"]*\b(se-on|se-u|crowd|board-icon|ph-box|active|play)\b[^"]*"|id="se-ui"/g) || [];
+  ok(html.startsWith('<!doctype html>') && html.length > 100000 && !leftover.length, 'Ctrl+S: 저장한 파일에 실행 중 표시가 남지 않음' + (leftover.length ? ' → ' + [...new Set(leftover)].slice(0, 5).join(' | ') : ''));
+  ok(/★/.test(html.split('id="summary-data"')[1].split('</template>')[0]), '정리표 데이터(한 곳)에 고친 글이 저장됨');
   const p3 = await ctx.newPage();
   const errs3 = [];
   p3.on('pageerror', (e) => errs3.push(e.message));
-  await p3.goto('file://' + saved + '#12'); await p3.waitForTimeout(400);
+  await p3.goto('file://' + saved + '#12'); await p3.waitForFunction(() => window.SE && SE.ready);
   const re = await p3.evaluate(([s1]) => ({
     slides: document.querySelectorAll('#deck > section.slide').length,
     head: document.querySelector('.slide.active .headline').textContent,
     cell: document.querySelectorAll('#deck > .slide')[s1 - 1].querySelector('tbody tr td:nth-child(2)').textContent,
-    tables: document.querySelectorAll('table.sum').length,
+    tables: document.querySelectorAll('#deck table.sum').length,
     crowds: [...document.querySelectorAll('.slide[data-layout="placard"]')].map((s) => s.querySelectorAll('.crowd').length),
     pts: [...document.querySelectorAll('.slide[data-layout="pattern"]')].map((s) => s.querySelectorAll('.pt').length),
-    words: [...document.querySelectorAll('.bs')].every((p) => !p.querySelector('.w .w')),
+    words: [...document.querySelectorAll('.bs')].every((p) => !p.querySelector('.se-u .se-u')),
     icons: document.querySelectorAll('.board-icon').length,
-    editAttr: !!document.querySelector('[contenteditable], [spellcheck]'),
-    editing: document.body.classList.contains('editing'),
   }), [N(47)]);
   ok(re.slides === TOTAL && /\(고침\)$/.test(re.head) && /★$/.test(re.cell), '저장한 파일을 다시 열면 고친 글이 그대로');
-  ok(!re.editAttr && !re.editing, '저장한 파일에 편집 흔적(contenteditable 등)이 남지 않음');
   ok(re.tables === 4 && re.crowds.every((c) => c === 1) && re.pts.every((c) => c === 1) && re.words && re.icons === BOARD.length && errs3.length === 0, '저장한 파일에 표·군중·패턴·연필이 겹쳐 생기지 않음, 오류 없음');
   await p3.close();
   fs.unlinkSync(saved);
   await press('KeyE');
-  ok(await page.evaluate(() => !document.body.classList.contains('editing') && !document.querySelector('#deck [contenteditable]')), 'E 다시: 편집 끝');
+  ok(await page.evaluate(() => !document.body.classList.contains('se-editing') && !document.querySelector('#deck [contenteditable]')), 'E 다시: 편집 끝');
 
   ok(errors.length === 0, '스크립트 오류 없음' + (errors.length ? ' → ' + errors.join(' | ') : ''));
 
