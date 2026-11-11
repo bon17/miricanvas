@@ -263,7 +263,8 @@ figure.ph.gone{display:none}
 .photo-side .title{margin-bottom:28px}
 .photo-side .big{font-size:180px;margin-bottom:28px}
 .photo-line{grid-column:1/3;grid-row:2}
-.slide.aral-frame{--photo-w:900px;column-gap:80px;padding:168px 80px 52px 120px}
+/* 60·61 사진 틀: 1989 사진의 가로세로 비율을 따른다(최대 900px). 스크립트가 --frame-w, --frame-shift를 정한다 */
+.slide.aral-frame{--photo-w:var(--frame-w,900px);column-gap:80px;padding:168px 80px 52px calc(120px + var(--frame-shift,0px))}
 
 /* photo-question · 사진과 질문, photo-zoom · 사진 확대 */
 .slide[data-layout="photo-question"],.slide[data-layout="photo-zoom"]{display:grid;grid-template-columns:1060px 1fr;grid-template-rows:minmax(0,1fr) auto;column-gap:72px;row-gap:20px;padding:104px 80px 56px}
@@ -286,8 +287,8 @@ figure.ph.gone{display:none}
 .cal-side{display:flex;justify-content:center;align-items:flex-start;padding-top:150px}
 
 /* compare · 비교 슬라이더 */
-.cmp-labels{position:absolute;left:120px;top:86px;width:900px;display:flex;justify-content:space-between;font-family:var(--display);font-weight:700;font-size:64px;line-height:1}
-.compare{position:absolute;left:120px;top:168px;width:900px;height:860px;--pos:50%;touch-action:none;cursor:ew-resize}
+.cmp-labels{position:absolute;left:calc(120px + var(--frame-shift,0px));top:86px;width:var(--frame-w,900px);display:flex;justify-content:space-between;font-family:var(--display);font-weight:700;font-size:64px;line-height:1}
+.compare{position:absolute;left:calc(120px + var(--frame-shift,0px));top:168px;width:var(--frame-w,900px);height:860px;--pos:50%;touch-action:none;cursor:ew-resize}
 .compare figure.ph{position:absolute;inset:0}
 .compare .cmp-top{clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
 .compare .cmp-top .ph-box{padding-right:50%}
@@ -944,7 +945,7 @@ figure.ph.cl{position:absolute}
 
 <!-- 60. 1989 · 사진 틀이 61번 비교 화면과 같은 크기·위치다 -->
 <section class="slide aral-frame" data-n="60" data-part="s3" data-layout="photo" data-title="1989">
-  <figure class="ph photo-main"><img src="images/aral-1989.jpg" data-desc="아랄해 위성 사진 (1989)" data-page="교과서 233쪽 또는 NASA Earth Observatory" alt="1989년의 아랄해 위성 사진"></figure>
+  <figure class="ph photo-main"><img src="images/aral-1989.jpg" data-aspect-source data-desc="아랄해 위성 사진 (1989)" data-page="교과서 233쪽 또는 NASA Earth Observatory" alt="1989년의 아랄해 위성 사진"></figure>
   <div class="photo-side">
     <p class="big">1989</p>
     <p class="caption">1989년의 아랄해</p>
@@ -956,7 +957,7 @@ figure.ph.cl{position:absolute}
   <div class="cmp-labels"><span>1989</span><span>2008</span></div>
   <div class="compare" data-interactive>
     <figure class="ph cmp-base"><img src="images/aral-2008.jpg" data-desc="아랄해 위성 사진 (2008)" data-page="교과서 233쪽 또는 NASA Earth Observatory" alt="2008년의 아랄해 위성 사진"></figure>
-    <figure class="ph cmp-top"><img src="images/aral-1989.jpg" data-desc="아랄해 위성 사진 (1989)" data-page="교과서 233쪽 또는 NASA Earth Observatory" alt="1989년의 아랄해 위성 사진"></figure>
+    <figure class="ph cmp-top"><img src="images/aral-1989.jpg" data-aspect-source data-desc="아랄해 위성 사진 (1989)" data-page="교과서 233쪽 또는 NASA Earth Observatory" alt="1989년의 아랄해 위성 사진"></figure>
     <div class="cmp-handle"><div class="cmp-knob"><svg viewBox="0 0 56 32" aria-hidden="true"><path d="M0 16 18 2v28zM56 16 38 2v28z"/></svg></div></div>
   </div>
   <div class="cmp-side"><div class="placard small">무엇이<br>달라졌을까?</div></div>
@@ -1269,6 +1270,21 @@ figure.ph.cl{position:absolute}
     });
   }
 
+  /* ---------- 60·61 사진 틀 너비를 1989 사진 비율에 맞춘다 (사진이 없으면 900px 그대로) ---------- */
+  function setupAspectFrames() {
+    each(deck.querySelectorAll('img[data-aspect-source]'), function (img) {
+      var slide = img.closest('.slide');
+      function apply() {
+        if (!img.naturalWidth || !img.naturalHeight) return;
+        var w = Math.round(Math.min(900, 860 * img.naturalWidth / img.naturalHeight));
+        slide.style.setProperty('--frame-w', w + 'px');
+        slide.style.setProperty('--frame-shift', Math.round((900 - w) / 2) + 'px');
+      }
+      img.addEventListener('load', apply);
+      if (img.complete) apply();
+    });
+  }
+
   /* ---------- 67 원: 다 커지면 애니메이션 표시를 지운다 ---------- */
   function setupCircles() {
     each(deck.querySelectorAll('.circle[data-grow-from]'), function (circle) {
@@ -1507,6 +1523,7 @@ figure.ph.cl{position:absolute}
   addBoardIcons();
   setupCompare();
   setupCircles();
+  setupAspectFrames();
   fitSummary();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSummary);
   window.addEventListener('load', fitSummary);

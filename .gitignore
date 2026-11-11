@@ -4,3 +4,4 @@ slides/dist/
 # 민주주의와 인권 수업: 교사가 넣는 사진(교과서 이미지)은 올리지 않는다
 democracy/images/*
 !democracy/images/README.txt
+democracy/dist/
