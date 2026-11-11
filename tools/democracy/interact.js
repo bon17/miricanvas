@@ -79,6 +79,13 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
   await goto(N(38));
   ok(await page.evaluate(() => /메이데이를 정했을까/.test(document.querySelector('.slide.active .why').textContent)), `${N(38)}: 메이데이를 정한 까닭이 보임`);
 
+  // 답을 보인 뒤 다른 장으로 가면, 숨은 장의 답 카드가 화면에 남지 않아야 한다
+  const leaked = () => page.evaluate(() => [...document.querySelectorAll('#deck > .slide:not(.active):not(.leaving) *')]
+    .filter((el) => getComputedStyle(el).visibility === 'visible').map((el) => el.closest('.slide').getAttribute('data-n') + ':' + el.className).slice(0, 5));
+  await goto(N(20)); await press('ArrowRight'); await press('ArrowRight'); await page.waitForTimeout(1500);
+  const lk = await leaked();
+  ok(await cur() === N(21) && lk.length === 0, `답을 본 뒤 ${N(21)}번으로 가도 다른 장의 답 카드가 남지 않음` + (lk.length ? ' → ' + lk.join(' | ') : ''));
+
   // 선택 장 건너뛰기 (단계가 있는 장은 단계까지 넘기며 끝까지)
   await press('Home'); await press('KeyS');
   ok(await page.evaluate(() => getComputedStyle(document.getElementById('skipflag')).display !== 'none'), 'S: "선택 장 건너뜀" 표시');
@@ -259,6 +266,8 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
   await press('KeyE');
   const ed = await page.evaluate(() => ({ on: document.body.classList.contains('editing'), n: document.querySelectorAll('#deck [contenteditable="true"]').length, bar: getComputedStyle(document.getElementById('edit-bar')).display }));
   ok(ed.on && ed.n > 300 && ed.bar !== 'none', `E: 편집 모드, 고칠 수 있는 글자 ${ed.n}곳, 편집 도구 막대`);
+  const lk2 = await leaked();
+  ok(lk2.length === 0, '편집 모드에서도 다른 장의 답 · 패턴 칸이 겹쳐 보이지 않음' + (lk2.length ? ' → ' + lk2.join(' | ') : ''));
   await page.locator('.slide.active .headline').click();
   await page.keyboard.press('End'); await page.keyboard.type('(고침)');
   await press('Escape');

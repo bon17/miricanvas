@@ -367,7 +367,8 @@ figure.ph.gone{display:none}
 
 /* 단계 공개: 같은 장에서 다음 키를 한 번 더 누르면 나타난다 (답 등) */
 .reveal{visibility:hidden}
-.reveal.shown,.editing .reveal,.show-all .reveal{visibility:visible}
+/* visible 이 아니라 inherit: 장이 숨겨지면 답도 함께 숨는다 (visible 이면 숨긴 장 위로 답만 남아 보인다) */
+.reveal.shown,.editing .reveal,.show-all .reveal{visibility:inherit}
 #stepflag{display:none;background:var(--mark);color:var(--ink);padding:0 10px}
 #stage.has-step #stepflag{display:inline-block}
 /* 피켓 장의 답 카드 */
@@ -660,7 +661,7 @@ body.editing [contenteditable="true"]{outline:2px dashed rgba(47,75,200,.5);outl
 body.editing [contenteditable="true"]:hover{outline-color:#2F4BC8}
 body.editing [contenteditable="true"]:focus{outline:3px solid #2F4BC8;background-color:rgba(255,228,92,.28)}
 .editing .sum tr.empty td:not(.mv){color:rgba(29,34,40,.4)}
-.editing .pt .later{visibility:visible;opacity:.45}
+.editing .pt .later{visibility:inherit;opacity:.45}
 </style>
 </head>
 <body>
