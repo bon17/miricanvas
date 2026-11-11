@@ -31,8 +31,8 @@ const [vw, vh] = (process.argv[4] || '1920x1080').split('x').map(Number);
     const fonts = [...document.fonts].map((f) => `${f.family} ${f.weight}: ${f.status}`);
     return { count: slides.length, nums: slides.map((s) => s.getAttribute('data-n')), fonts };
   });
-  const expected = Array.from({ length: 77 }, (_, i) => String(i + 1).padStart(2, '0'));
-  console.log(`slides: ${info.count}` + (JSON.stringify(info.nums) === JSON.stringify(expected) ? ' (01–77 순서 일치)' : ' !! 번호 불일치 ' + info.nums.join(',')));
+  const expected = Array.from({ length: info.count }, (_, i) => String(i + 1).padStart(2, '0'));
+  console.log(`slides: ${info.count}` + (JSON.stringify(info.nums) === JSON.stringify(expected) ? ` (01–${info.count} 순서 일치)` : ' !! 번호 불일치 ' + info.nums.join(',')));
   console.log('fonts: ' + info.fonts.join(' | '));
 
   if (outDir) fs.mkdirSync(outDir, { recursive: true });

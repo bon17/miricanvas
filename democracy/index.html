@@ -6,7 +6,7 @@
 <title>민주주의와 인권의 확산</title>
 <!--
   ============================================================
-  민주주의와 인권의 확산 · 중2 역사 · 수업 슬라이드 (77장)
+  민주주의와 인권의 확산 · 중2 역사 · 수업 슬라이드 (78장)
   ============================================================
   ● 여는 법: 이 파일을 더블클릭하면 크롬·엣지·웨일에서 열린다. 인터넷이 없어도 된다.
   ● 문구 고치기: 아래 body 안에서 "05. 핵심 질문"처럼 번호와 제목이 적힌
@@ -14,11 +14,12 @@
     - <br> 는 줄바꿈이다. 지워도 되고 옮겨도 된다.
     - <aside class="notes"> 안의 글은 교사 메모다(N 키로 보임).
   ● 사진: images 폴더에 정해진 파일명으로 넣는다(images/README.txt 참고).
-  ● 정리표(31·47·70·71번)와 패턴(73~76번)의 문구는 각각 한 곳에만 있다.
+  ● 정리표(32·48·71·72번)와 패턴(74~77번)의 문구는 각각 한 곳에만 있다.
     "정리표 데이터", "패턴 데이터" 주석을 찾아 고친다.
   ● 조작: → Space PageDown Enter 다음 / ← PageUp Backspace 이전 / Home End 처음·끝
           숫자+Enter 그 장으로 / F 전체 화면 / S 선택 장 건너뛰기 / N 메모 / O 전체 목록
-          M 움직임 끄기·켜기
+          M 움직임 끄기·켜기 / E 편집 모드(글자를 눌러 고치고 Ctrl+S로 저장)
+  ● 단계: class="reveal" 이 붙은 요소는 그 장에서 다음 키를 한 번 더 눌러야 나타난다(답 등).
 -->
 <style>
 /* ---------- 글꼴 (fonts 폴더) ---------- */
@@ -168,7 +169,7 @@ figure.ph.gone{display:none}
 .main-col.tight .chips span{font-size:34px}
 .main-col.tight .facts-list li{font-size:36px}
 .main-col.tight .chips-label,.main-col.tight .facts-list{margin-top:24px}
-/* 사진이 없어 오른쪽 단이 사라지면 글자를 키운다 (49번) */
+/* 사진이 없어 오른쪽 단이 사라지면 글자를 키운다 (50번) */
 .slide.with-side:has(> .side-col > figure.gone) .big{font-size:320px}
 .slide.with-side:has(> .side-col > figure.gone) .headline{font-size:120px}
 .slide.with-side:has(> .side-col > figure.gone) .desc{font-size:68px}
@@ -228,14 +229,14 @@ figure.ph.gone{display:none}
 .chips-label{margin-top:44px}
 .chips{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px}
 .chips span{border:4px solid var(--c);padding:6px 22px;font-size:40px;font-weight:700;line-height:1.3;background:#fff}
-/* 34번 일력 */
+/* 35번 일력 */
 .tearcal{position:relative;align-self:center;width:640px;height:760px;background:#fff;border:6px solid var(--ink);display:flex;flex-direction:column;align-items:center;text-align:center}
 .tearcal::before{content:"";position:absolute;left:24px;right:24px;top:-26px;height:40px;background:radial-gradient(circle,var(--ink) 11px,transparent 12px) 0 50%/80px 40px repeat-x}
 .tc-top{align-self:stretch;background:var(--cal-red);color:#fff;font-family:var(--display);font-weight:700;font-size:64px;line-height:1;padding:40px 0 30px}
 .tc-day{font-family:var(--display);font-weight:700;font-size:400px;line-height:1;color:var(--cal-red);margin-top:30px}
 .tc-week{font-size:52px;font-weight:700;color:var(--muted)}
 .tc-label{margin-top:22px;font-family:var(--display);font-weight:700;font-size:78px;line-height:1;background:var(--story-2);padding:14px 40px}
-/* 24번 두 해 비교 */
+/* 25번 두 해 비교 */
 .steps2{display:flex;flex-direction:column;align-items:stretch;gap:0}
 .st2{border:6px solid var(--ink);background:#fff;padding:34px 44px}
 .st2.on{background:var(--c);color:var(--on-c)}
@@ -300,7 +301,7 @@ figure.ph.gone{display:none}
 .points li+li{margin-top:40px}
 .points li::before{content:"";position:absolute;left:0;top:.71em;width:40px;height:10px;margin-top:-5px;background:var(--c);transform-origin:0 50%}
 .points+.caption{margin-top:60px}
-/* 39번 문서 카드 */
+/* 40번 문서 카드 */
 .doc{display:flex;gap:40px;align-items:center;border:6px solid var(--ink);background:#fff;padding:40px}
 .doc figure.ph{flex:none;width:300px;height:440px}
 .doc-y{font-family:var(--display);font-weight:700;font-size:58px;line-height:1.15;color:var(--c)}
@@ -332,20 +333,58 @@ figure.ph.gone{display:none}
 .source-box .empty-msg{color:var(--muted)}
 
 /* photo · 사진 */
-.slide[data-layout="photo"]{--photo-w:1340px;display:grid;grid-template-columns:var(--photo-w) 1fr;grid-template-rows:minmax(0,1fr) auto;column-gap:56px;row-gap:28px;padding:96px 80px 60px}
+.slide[data-layout="photo"]{--photo-w:1340px;display:grid;grid-template-columns:var(--fit-w,var(--photo-w)) 1fr;grid-template-rows:minmax(0,1fr) auto;column-gap:56px;row-gap:28px;padding:96px 80px 60px}
 .photo-main{grid-column:1;grid-row:1}
 .photo-side{grid-column:2;grid-row:1;display:flex;flex-direction:column;justify-content:flex-end;min-width:0}
 .photo-side .title{margin-bottom:28px}
 .photo-side .big{font-size:190px;margin-bottom:28px}
 .photo-line{grid-column:1/3;grid-row:2}
-/* 60·61 사진 틀: 1989 사진의 가로세로 비율을 따른다(최대 900px). 스크립트가 --frame-w, --frame-shift를 정한다 */
+/* 61·62 사진 틀: 1989 사진의 가로세로 비율을 따른다(최대 900px). 스크립트가 --frame-w, --frame-shift를 정한다 */
 .slide.aral-frame{--photo-w:var(--frame-w,900px);column-gap:80px;padding:168px 80px 52px calc(120px + var(--frame-shift,0px))}
 
 /* photo-question · 사진과 질문, photo-zoom · 사진 확대 */
-.slide[data-layout="photo-question"],.slide[data-layout="photo-zoom"]{display:grid;grid-template-columns:1080px 1fr;grid-template-rows:minmax(0,1fr) auto;column-gap:64px;row-gap:20px;padding:96px 80px 56px}
+.slide[data-layout="photo-question"],.slide[data-layout="photo-zoom"]{display:grid;grid-template-columns:var(--fit-w,1080px) 1fr;grid-template-rows:minmax(0,1fr) auto;column-gap:64px;row-gap:20px;padding:96px 80px 56px}
 .pq-photo{grid-column:1;grid-row:1}
 .pq-caption{grid-column:1;grid-row:2}
 .pq-side{grid-column:2;grid-row:1/3;display:flex;justify-content:center;align-items:flex-start;padding-top:110px}
+
+/* 사진 틀을 사진 비율에 맞춘 장: 스크립트가 fitted 와 --fit-w, 사진 틀 크기를 정한다 */
+.slide.fitted[data-layout="photo"],.slide.fitted[data-layout="photo-question"]{grid-template-rows:auto auto;align-content:center}
+
+/* contrast · 두 나라 비교 (14번) */
+.slide[data-layout="contrast"]{display:flex;flex-direction:column;justify-content:center;padding:56px 120px 40px}
+.ct{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:44px}
+.ct-panel{display:flex;flex-direction:column;min-height:620px;border:6px solid var(--ink);background:#fff;padding:40px 52px 48px}
+.ct-panel.us{border-top:30px solid var(--story-1)}
+.ct-panel.sa{background:var(--ink);color:#fff;border-top:30px solid var(--cal-red)}
+.ct-head{font-family:var(--display);font-weight:700;font-size:88px;line-height:1.1}
+.ct-list{list-style:none;padding:0;margin:44px 0 0}
+.ct-item{position:relative;padding-left:100px;font-size:56px;font-weight:700;line-height:1.35}
+.ct-item+.ct-item{margin-top:34px}
+.ct-item::before{content:"";position:absolute;left:0;top:2px;width:68px;height:68px;border-radius:50%;background:var(--story-1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M9 21l7 7 15-16' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/44px no-repeat}
+.ct-item.no::before{background-color:var(--cal-red);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M11 11l18 18M29 11 11 29' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E")}
+.ct-foot{margin-top:auto;padding-top:36px;font-family:var(--display);font-weight:700;font-size:104px;line-height:1;color:var(--mark)}
+
+/* 단계 공개: 같은 장에서 다음 키를 한 번 더 누르면 나타난다 (답 등) */
+.reveal{visibility:hidden}
+.reveal.shown,.editing .reveal,.show-all .reveal{visibility:visible}
+#stepflag{display:none;background:var(--mark);color:var(--ink);padding:0 10px}
+#stage.has-step #stepflag{display:inline-block}
+/* 피켓 장의 답 카드 */
+.answer{position:absolute;left:50%;bottom:56px;z-index:2;display:flex;align-items:center;gap:30px;width:max-content;max-width:1640px;transform:translateX(-50%) rotate(.8deg);background:#fff;border:8px solid var(--ink);padding:24px 52px 24px 28px}
+.ans-tag{flex:none;width:100px;height:100px;border-radius:50%;border:6px solid var(--ink);background:var(--c);color:var(--on-c);font-family:var(--display);font-weight:700;font-size:52px;line-height:88px;text-align:center}
+.ans-text{font-size:54px;font-weight:700;line-height:1.35;color:var(--ink);text-wrap:balance}
+.ans-sub{margin-top:4px;font-size:38px;font-weight:600;line-height:1.35;color:var(--muted)}
+/* 37번 답: 하루 24시간을 셋으로 */
+.a8{position:absolute;left:1220px;right:72px;bottom:52px;z-index:2;display:flex;flex-direction:column;gap:14px}
+.a8>div{display:grid;grid-template-columns:auto 1fr;column-gap:24px;align-items:center;background:#fff;border:6px solid var(--ink);padding:14px 22px 14px 14px}
+.a8 b{grid-row:1/3;align-self:stretch;display:flex;align-items:center;background:var(--story-2);padding:0 16px;font-family:var(--display);font-weight:700;font-size:58px;line-height:1}
+.a8 span{font-size:40px;font-weight:700;line-height:1.25}
+.a8 i{font-style:normal;font-size:32px;font-weight:600;line-height:1.3;color:var(--muted)}
+/* 39번: 왜 메이데이를 정했을까 */
+.why{margin-top:44px;border-left:14px solid var(--c);background:#fff;padding:26px 34px 28px}
+.why-q{font-family:var(--display);font-weight:700;font-size:52px;line-height:1.2}
+.why-a{margin-top:14px;font-size:42px;font-weight:600;line-height:1.45}
 
 /* calendar · 달력 */
 .slide[data-layout="calendar"]{display:grid;grid-template-columns:1200px 1fr;column-gap:56px;padding:68px 80px 20px}
@@ -579,7 +618,7 @@ figure.ph.cl{position:absolute}
 .motion .play .sum tbody tr{animation:mLeft .7s var(--out) both;--d:calc(.3s + var(--i) * .12s)}
 .motion .play .sum tr.hl td{animation:mGlowRow 1.2s ease both;--d:1s}
 @keyframes mGlowRow{0%{background:transparent}40%{background:var(--mark)}100%{background:var(--rt)}}
-/* 패턴: 새 단계만 튀어나온다, 76번 꼬리 화살표는 계속 흐른다 */
+/* 패턴: 새 단계만 튀어나온다, 77번 꼬리 화살표는 계속 흐른다 */
 .motion .play .pt .new{animation:mPop .9s var(--spring) both;--d:.2s}
 .motion .play .pt .pt-arrow.new{animation:mDrawX .5s var(--io) both;--d:0s}
 .motion .play .pt .pt-step figure.ph{animation:none}
@@ -587,6 +626,41 @@ figure.ph.cl{position:absolute}
 #stage.motion .slide.play .pt-tail{animation-delay:calc(var(--base) + .9s),calc(var(--base) + 1.5s) !important}
 /* 원 */
 .motion .play .circle:not(.grow){animation:mPop .9s var(--spring) both;--d:.5s}
+/* 두 나라 비교 */
+.motion .play .ct-panel.us{animation:mLeft .9s var(--out) both;--d:.25s}
+.motion .play .ct-panel.us .ct-item{animation:mLeft .7s var(--out) both;--d:calc(.6s + var(--i) * .18s)}
+/* 단계 공개: 바로 나타난다 */
+@keyframes mAnswer{0%{opacity:0;translate:0 140px;scale:.85}60%{opacity:1;translate:0 -10px;scale:1.03}100%{opacity:1;translate:0 0;scale:1}}
+@keyframes mSlam{0%{opacity:0;translate:260px 0;rotate:6deg;scale:1.1}65%{opacity:1;translate:-14px 0;rotate:-1deg;scale:1}100%{opacity:1;translate:0 0;rotate:0deg;scale:1}}
+#stage.motion .slide.play .reveal.shown,#stage.motion .slide.play .reveal.shown *{animation-delay:var(--d,0s) !important}
+#stage.motion .slide.play .answer.shown{animation:mAnswer .8s var(--out) both}
+#stage.motion .slide.play .ct-panel.sa.shown{animation:mSlam .8s var(--out) both}
+#stage.motion .slide.play .ct-panel.sa.shown .ct-item{animation:mLeft .6s var(--out) both;--d:calc(.4s + var(--i) * .16s)}
+#stage.motion .slide.play .ct-panel.sa.shown .ct-foot{animation:mPop .8s var(--spring) both;--d:.85s}
+#stage.motion .slide.play .a8.shown>div{animation:mRight .7s var(--out) both;--d:calc(var(--i) * .16s)}
+.motion .play .why{animation:mRise .8s var(--out) both;--d:.75s}
+
+/* ===================== 편집 모드 (E) ===================== */
+#edit-bar{position:fixed;left:0;right:0;top:0;z-index:100;display:none;align-items:center;gap:10px;padding:8px 14px;background:#1D2228;color:#F2F3EF;font:600 15px/1.3 var(--text);box-shadow:0 2px 10px rgba(0,0,0,.3)}
+body.editing #edit-bar{display:flex}
+#edit-bar .hint{color:#AEB4BC;font-weight:400;margin-right:auto}
+#edit-bar button{font:600 15px/1 var(--text);color:#1D2228;background:#F2F3EF;border:0;padding:9px 14px;cursor:pointer}
+#edit-bar button.primary{background:#FFE45C}
+#edit-bar button:hover{filter:brightness(.92)}
+#edit-count{color:#FFE45C;min-width:7em;text-align:right}
+#edit-btn{position:fixed;left:14px;bottom:14px;z-index:90;display:flex;align-items:center;gap:6px;padding:8px 12px;border:0;background:rgba(29,34,40,.82);color:#fff;font:600 14px/1 var(--text);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s}
+#edit-btn svg{width:16px;height:16px}
+body.show-edit-btn #edit-btn{opacity:1;pointer-events:auto}
+body.editing #edit-btn{display:none}
+#toast{position:fixed;left:50%;bottom:28px;z-index:110;transform:translateX(-50%);background:#1D2228;color:#fff;font:600 16px/1.4 var(--text);padding:10px 18px;opacity:0;pointer-events:none;transition:opacity .3s}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){#edit-btn,#toast{transition:none}}
+body.editing #viewport{user-select:text;-webkit-user-select:text}
+body.editing [contenteditable="true"]{outline:2px dashed rgba(47,75,200,.5);outline-offset:4px;cursor:text}
+body.editing [contenteditable="true"]:hover{outline-color:#2F4BC8}
+body.editing [contenteditable="true"]:focus{outline:3px solid #2F4BC8;background-color:rgba(255,228,92,.28)}
+.editing .sum tr.empty td:not(.mv){color:rgba(29,34,40,.4)}
+.editing .pt .later{visibility:visible;opacity:.45}
 </style>
 </head>
 <body>
@@ -626,7 +700,7 @@ figure.ph.cl{position:absolute}
   <figure class="ph cl cl-d"><img src="images/vietnam-protest.jpg" data-desc="베트남 전쟁 반대 시위 (미국)" data-page="교과서 232쪽" alt="베트남 전쟁 반대 시위"></figure>
   <figure class="ph cl cl-e"><img src="images/aral-2008.jpg" data-desc="아랄해 위성 사진 (2008)" data-page="교과서 233쪽 또는 NASA Earth Observatory" alt="아랄해 위성 사진 2008"></figure>
   <div class="cl-q"><div class="placard small">이 사진들에는<br>어떤 공통점이 있을까?</div></div>
-  <aside class="notes">답을 받지 않는다. "수업 마지막에 다시 물어볼게요." 72번에서 같은 화면을 다시 쓴다.</aside>
+  <aside class="notes">답을 받지 않는다. "수업 마지막에 다시 물어볼게요." 73번에서 같은 화면을 다시 쓴다.</aside>
 </section>
 
 <!-- 03. 오늘의 세 질문 -->
@@ -641,7 +715,7 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- ==========================================================
-     이야기 ① 사람은 누구나 평등한가? · 04–31 · 3–19분
+     이야기 ① 사람은 누구나 평등한가? · 04–32 · 3–19분
      ========================================================== -->
 
 <!-- 04. 구분 화면 -->
@@ -654,7 +728,7 @@ figure.ph.cl{position:absolute}
   </div>
 </section>
 
-<!-- ───────── 민권 운동 (05–20) ───────── -->
+<!-- ───────── 민권 운동 (05–21) ───────── -->
 
 <!-- 05. 핵심 질문 -->
 <section class="slide" data-n="05" data-part="s1" data-layout="placard" data-title="핵심 질문">
@@ -768,16 +842,39 @@ figure.ph.cl{position:absolute}
   <aside class="notes">참정권은 선거에 참여할 권리. 참고로 이때 만들어진 법이 투표권법이지만 교과서에는 법 이름이 나오지 않는다.</aside>
 </section>
 
-<!-- 14. 남아프리카 공화국 -->
-<section class="slide" data-n="14" data-part="s1" data-layout="photo-question" data-title="남아프리카 공화국">
+<!-- 14. 같은 시기 남아프리카 공화국 · 다음 키를 한 번 더 누르면 오른쪽(남아프리카 공화국)이 나타난다 -->
+<section class="slide" data-n="14" data-part="s1" data-layout="contrast" data-title="같은 시기 남아프리카 공화국">
+  <h2 class="title">같은 시기, 남아프리카 공화국은?</h2>
+  <div class="ct">
+    <div class="ct-panel us">
+      <p class="ct-head">미국</p>
+      <ul class="ct-list">
+        <li class="ct-item">1964 민권법 제정</li>
+        <li class="ct-item">1965 모든 흑인에게 참정권 보장</li>
+      </ul>
+    </div>
+    <div class="ct-panel sa reveal">
+      <p class="ct-head">남아프리카 공화국</p>
+      <ul class="ct-list">
+        <li class="ct-item no">인종 분리 정책 실시</li>
+        <li class="ct-item no">흑인의 참정권 부정</li>
+      </ul>
+      <p class="ct-foot">아파르트헤이트</p>
+    </div>
+  </div>
+  <aside class="notes">"미국에서 법으로 차별을 금지하던 바로 그때, 지구 반대편에서는 어땠을까요?" 다음 키를 누르면 오른쪽이 나타난다. 미국에서 민권법(1964)과 참정권(1965)이 보장되던 때에도 남아프리카 공화국에서는 아파르트헤이트가 계속되고 있었다. 참고: 아파르트헤이트는 1948년부터 법으로 시행되었고 1990년대 초에 폐지되었다(교과서에는 연도가 없다).</aside>
+</section>
+
+<!-- 15. 남아프리카 공화국 -->
+<section class="slide" data-n="15" data-part="s1" data-layout="photo-question" data-title="남아프리카 공화국">
   <figure class="ph pq-photo"><img src="images/apartheid-museum.jpg" data-desc="아파르트헤이트 박물관 입구 (백인 / 비백인 표지판)" data-page="교과서 228쪽" alt="아파르트헤이트 박물관 입구"></figure>
   <p class="caption pq-caption">아파르트헤이트 박물관 입구 (남아프리카 공화국)</p>
   <div class="pq-side"><div class="placard small">입구가 왜<br>두 개일까?</div></div>
   <aside class="notes">표지판에 '백인'과 '비(非)백인'. 박물관이 당시 공공시설처럼 입구를 인종별로 나누어 재현했다.</aside>
 </section>
 
-<!-- 15. 아파르트헤이트 -->
-<section class="slide with-side" data-n="15" data-part="s1" data-layout="term" data-title="아파르트헤이트">
+<!-- 16. 아파르트헤이트 -->
+<section class="slide with-side" data-n="16" data-part="s1" data-layout="term" data-title="아파르트헤이트">
   <div class="main-col">
     <div class="term-block">
       <p class="term">아파르트헤이트</p>
@@ -791,8 +888,8 @@ figure.ph.cl{position:absolute}
   </div>
 </section>
 
-<!-- 16. 넬슨 만델라 -->
-<section class="slide with-side" data-n="16" data-part="s1" data-layout="points" data-title="넬슨 만델라">
+<!-- 17. 넬슨 만델라 -->
+<section class="slide with-side" data-n="17" data-part="s1" data-layout="points" data-title="넬슨 만델라">
   <div class="main-col">
     <h2 class="title">넬슨 만델라</h2>
     <ul class="points">
@@ -808,16 +905,16 @@ figure.ph.cl{position:absolute}
   <aside class="notes">27년 넘게 수감되었다(1962~1990). 참고: 만델라는 1960년대 초 무장 투쟁 노선을 택하기도 했고 이것이 수감 이유가 되었다. 교과서는 비폭력·불복종 중심으로 서술하므로, 학생이 물으면 보충한다.</aside>
 </section>
 
-<!-- 17. 노벨 평화상 -->
-<section class="slide" data-n="17" data-part="s1" data-layout="photo" data-title="노벨 평화상">
+<!-- 18. 노벨 평화상 -->
+<section class="slide" data-n="18" data-part="s1" data-layout="photo" data-title="노벨 평화상">
   <figure class="ph photo-main"><img src="images/mandela-nobel.jpg" data-desc="노벨 평화상을 받은 넬슨 만델라" data-page="교과서 228쪽" alt="노벨 평화상을 받은 넬슨 만델라"></figure>
   <div class="photo-side"><p class="caption">노벨 평화상을 받은 넬슨 만델라</p></div>
   <p class="body photo-line">석방 후 아파르트헤이트 폐지에 힘썼고, 인종 차별을 금지하는 법이 만들어졌다</p>
   <aside class="notes">1993년 수상. 사진 옆 인물은 함께 상을 받은 당시 대통령 데 클레르크.</aside>
 </section>
 
-<!-- 18. 그 후 (선택) -->
-<section class="slide with-side" data-n="18" data-part="s1" data-layout="fact" data-optional="true" data-title="그 후">
+<!-- 19. 그 후 (선택) -->
+<section class="slide with-side" data-n="19" data-part="s1" data-layout="fact" data-optional="true" data-title="그 후">
   <div class="main-col">
     <p class="big">1994</p>
     <p class="headline">모든 인종이 참여한 첫 선거</p>
@@ -829,22 +926,24 @@ figure.ph.cl{position:absolute}
   </div>
 </section>
 
-<!-- 19. 질문 (판서) -->
-<section class="slide" data-n="19" data-part="s1" data-layout="placard" data-board="true" data-title="질문">
+<!-- 20. 질문 (판서) -->
+<section class="slide" data-n="20" data-part="s1" data-layout="placard" data-board="true" data-title="질문">
   <div class="placard">법으로 차별을 금지한 것은<br>왜 중요할까?</div>
-  <aside class="notes">1~2명의 답을 받는다. 정리: 인종에 관계없이 동등한 권리를 가진다는 원칙이 제도로 자리 잡았다. ✏️ 판서: 민권 행.</aside>
+  <div class="answer reveal"><span class="ans-tag">답</span><div><p class="ans-text">인종에 관계없이 동등한 권리를 가진다는<br>원칙이 제도로 자리 잡았다</p></div></div>
+  <aside class="notes">1~2명의 답을 받는다. 정리: 인종에 관계없이 동등한 권리를 가진다는 원칙이 제도로 자리 잡았다. (다음 키를 누르면 답이 나온다) ✏️ 판서: 민권 행.</aside>
 </section>
 
-<!-- 20. 연결 -->
-<section class="slide" data-n="20" data-part="s1" data-layout="placard" data-title="연결">
+<!-- 21. 연결 -->
+<section class="slide" data-n="21" data-part="s1" data-layout="placard" data-title="연결">
   <div class="placard">법이 생기면<br>차별은 다 사라질까?</div>
-  <aside class="notes">답을 기다리지 않고 바로 여성 운동으로 넘어간다.</aside>
+  <div class="answer reveal"><span class="ans-tag">답</span><div><p class="ans-text">법이 생겨도 일상 속 차별은 쉽게 사라지지 않는다</p><p class="ans-sub">다음 이야기: 참정권을 얻은 뒤에도 차별에 맞선 여성들</p></div></div>
+  <aside class="notes">학생 답을 짧게 받고, 다음 키로 답을 보인 뒤 바로 여성 운동으로 넘어간다.</aside>
 </section>
 
-<!-- ───────── 여성 운동 (21–30) ───────── -->
+<!-- ───────── 여성 운동 (22–31) ───────── -->
 
-<!-- 21. 참정권 획득 -->
-<section class="slide with-side" data-n="21" data-part="s1" data-layout="fact" data-title="참정권 획득">
+<!-- 22. 참정권 획득 -->
+<section class="slide with-side" data-n="22" data-part="s1" data-layout="fact" data-title="참정권 획득">
   <div class="main-col">
     <p class="big">참정권</p>
     <p class="headline">두 차례 세계 대전 전후</p>
@@ -857,16 +956,16 @@ figure.ph.cl{position:absolute}
   <aside class="notes">"그런데 투표를 할 수 있게 된 뒤에는 차별이 사라졌을까요?"</aside>
 </section>
 
-<!-- 22. 보스턴 마라톤 -->
-<section class="slide" data-n="22" data-part="s1" data-layout="photo-question" data-title="보스턴 마라톤">
+<!-- 23. 보스턴 마라톤 -->
+<section class="slide" data-n="23" data-part="s1" data-layout="photo-question" data-title="보스턴 마라톤">
   <figure class="ph pq-photo"><img src="images/boston-1967.jpg" data-desc="보스턴 마라톤에서 저지당하는 여성 주자" data-page="교과서 229쪽" alt="보스턴 마라톤에서 저지당하는 여성 주자"></figure>
   <p class="caption pq-caption">보스턴 마라톤 대회 (1967)</p>
   <div class="pq-side"><div class="placard small">이 사람은 왜<br>막히고 있을까?</div></div>
   <aside class="notes">학생 추측을 2~3개 받는다.</aside>
 </section>
 
-<!-- 23. 답 -->
-<section class="slide with-side" data-n="23" data-part="s1" data-layout="fact" data-title="답">
+<!-- 24. 답 -->
+<section class="slide with-side" data-n="24" data-part="s1" data-layout="fact" data-title="답">
   <div class="main-col">
     <p class="big">1967</p>
     <p class="headline">번호표를 달고 정식으로 참가한 최초의 여성</p>
@@ -879,8 +978,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">당시에는 남성만 참가하는 것이 당연해서 신청서에 성별 칸이 없었다. 참고: 1966년에 번호표 없이 비공식으로 달린 여성이 있었기 때문에 '정식 참가'로 표현한다.</aside>
 </section>
 
-<!-- 24. 공식 허용 -->
-<section class="slide with-side" data-n="24" data-part="s1" data-layout="fact" data-title="공식 허용">
+<!-- 25. 공식 허용 -->
+<section class="slide with-side" data-n="25" data-part="s1" data-layout="fact" data-title="공식 허용">
   <div class="main-col">
     <p class="big">1972</p>
     <p class="headline">보스턴 마라톤, 여성 참가를 공식 허용</p>
@@ -894,28 +993,28 @@ figure.ph.cl{position:absolute}
   </div>
 </section>
 
-<!-- 25. 질문 (선택) -->
-<section class="slide" data-n="25" data-part="s1" data-layout="placard" data-optional="true" data-title="질문">
+<!-- 26. 질문 (선택) -->
+<section class="slide" data-n="26" data-part="s1" data-layout="placard" data-optional="true" data-title="질문">
   <div class="placard">과거 여성에게 금지되었던<br>활동에는 또 무엇이 있을까?</div>
   <aside class="notes">교과서 229쪽 탐구의 (가) 질문.</aside>
 </section>
 
-<!-- 26. 1971년 영국 -->
-<section class="slide" data-n="26" data-part="s1" data-layout="photo" data-title="1971년 영국">
+<!-- 27. 1971년 영국 -->
+<section class="slide" data-n="27" data-part="s1" data-layout="photo" data-title="1971년 영국">
   <figure class="ph photo-main"><img src="images/uk-women-1971.jpg" data-desc="행진하는 영국 여성들 (1971)" data-page="교과서 229쪽" alt="행진하는 영국 여성들"></figure>
   <div class="photo-side"><p class="caption">행진하는 영국 여성들 (1971)</p></div>
   <p class="body photo-line">교육과 취업, 직장 내 급여의 평등 등을 요구하며 행진했다</p>
 </section>
 
-<!-- 27. 피켓 읽기 · 확대 배율(data-zoom)과 위치(data-focus)는 사진을 넣은 뒤 피켓이 보이게 조정한다 -->
-<section class="slide" data-n="27" data-part="s1" data-layout="photo-zoom" data-title="피켓 읽기">
+<!-- 28. 피켓 읽기 · 확대 배율(data-zoom)과 위치(data-focus)는 사진을 넣은 뒤 피켓이 보이게 조정한다 -->
+<section class="slide" data-n="28" data-part="s1" data-layout="photo-zoom" data-title="피켓 읽기">
   <figure class="ph pq-photo"><img src="images/uk-women-1971.jpg" data-zoom="2.2" data-focus="78% 25%" data-desc="행진하는 영국 여성들 (1971) · 피켓 확대" data-page="교과서 229쪽" alt="행진하는 영국 여성들의 피켓"></figure>
   <div class="pq-side"><div class="placard small">무엇을<br>요구하고 있을까?</div></div>
   <aside class="notes">피켓의 EQUAL PAY NOW, EQUAL EDUCATION AND JOB OPPORTUNITIES를 함께 읽고 뜻을 풀어 준다.</aside>
 </section>
 
-<!-- 28. 요구 -->
-<section class="slide" data-n="28" data-part="s1" data-layout="icons" data-title="요구">
+<!-- 29. 요구 -->
+<section class="slide" data-n="29" data-part="s1" data-layout="icons" data-title="요구">
   <h2 class="title">여성들이 요구한 것</h2>
   <div class="icons">
     <figure>
@@ -934,8 +1033,8 @@ figure.ph.cl{position:absolute}
   <p class="caption" style="margin-top:56px">일상에 남아 있던 성차별과 성 역할 분리에 도전했다</p>
 </section>
 
-<!-- 29. 핵심 용어 (판서) -->
-<section class="slide" data-n="29" data-part="s1" data-layout="term" data-board="true" data-title="핵심 용어">
+<!-- 30. 핵심 용어 (판서) -->
+<section class="slide" data-n="30" data-part="s1" data-layout="term" data-board="true" data-title="핵심 용어">
   <div class="term-flow">
     <p class="from">남성 중심<br>사회 체제</p>
     <svg class="arrow" viewBox="0 0 200 64" aria-hidden="true"><path d="M0 32h160" stroke="currentColor" stroke-width="12"/><path d="M200 32 152 4v56z" fill="currentColor"/></svg>
@@ -948,8 +1047,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">'스스로 확인하기' 빈칸 정답은 '남성'. 여성 운동은 지금도 계속되며, 인종·국적·종교·계층·문화적 다양성으로 관심을 넓혀 가고 있다. ✏️ 판서: 여성 행.</aside>
 </section>
 
-<!-- 30. 지금도 계속된다 -->
-<section class="slide" data-n="30" data-part="s1" data-layout="photo" data-title="지금도 계속된다">
+<!-- 31. 지금도 계속된다 -->
+<section class="slide" data-n="31" data-part="s1" data-layout="photo" data-title="지금도 계속된다">
   <figure class="ph photo-main"><img src="images/saudi-2018.jpg" data-desc="운전면허증을 받고 기뻐하는 여성" data-page="교과서 229쪽" alt="운전면허증을 받고 기뻐하는 여성"></figure>
   <div class="photo-side">
     <h2 class="title">지금도 계속된다</h2>
@@ -960,7 +1059,7 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- ==========================================================
-     정리표 데이터 · 31, 47, 70, 71번이 이 표 하나를 함께 쓴다.
+     정리표 데이터 · 32, 48, 71, 72번이 이 표 하나를 함께 쓴다.
      문구는 여기서만 고친다. 장마다 어느 행을 채우고 강조할지는
      각 장의 data-fill(채울 행), data-highlight(강조할 행)에 운동 이름으로 적는다.
      ========================================================== -->
@@ -978,18 +1077,18 @@ figure.ph.cl{position:absolute}
   </table>
 </template>
 
-<!-- 31. 이야기 ① 정리 -->
-<section class="slide" data-n="31" data-part="s1" data-layout="summary" data-fill="민권, 여성" data-highlight="민권, 여성" data-title="이야기 ① 정리">
+<!-- 32. 이야기 ① 정리 -->
+<section class="slide" data-n="32" data-part="s1" data-layout="summary" data-fill="민권, 여성" data-highlight="민권, 여성" data-title="이야기 ① 정리">
   <h2 class="title">이야기 ① 정리</h2>
   <div class="sum-holder"></div>
 </section>
 
 <!-- ==========================================================
-     이야기 ② 일하는 사람에게는 어떤 권리가 필요할까? · 32–47 · 19–28분
+     이야기 ② 일하는 사람에게는 어떤 권리가 필요할까? · 33–48 · 19–28분
      ========================================================== -->
 
-<!-- 32. 구분 화면 -->
-<section class="slide" data-n="32" data-part="s2" data-layout="roadmap" data-title="구분 화면">
+<!-- 33. 구분 화면 -->
+<section class="slide" data-n="33" data-part="s2" data-layout="roadmap" data-title="구분 화면">
   <p class="rm-target teacher">목표 19분</p>
   <div class="rm-cards">
     <div class="rm-card s1 off"><figure class="ph"><img src="images/king-march.jpg" data-focus="15% 45%" data-desc="연설하는 마틴 루서 킹과 군중" data-page="교과서 228쪽" alt=""></figure><div class="rm-body"><div class="rm-num">1</div><p class="rm-q">사람은 누구나 평등한가?</p><p class="rm-mv">민권 운동 · 여성 운동</p></div></div>
@@ -998,8 +1097,8 @@ figure.ph.cl{position:absolute}
   </div>
 </section>
 
-<!-- 33. 2026년 5월 달력 · 2026년 5월 1일은 금요일 -->
-<section class="slide" data-n="33" data-part="s2" data-layout="calendar" data-title="2026년 5월 달력">
+<!-- 34. 2026년 5월 달력 · 2026년 5월 1일은 금요일 -->
+<section class="slide" data-n="34" data-part="s2" data-layout="calendar" data-title="2026년 5월 달력">
   <div>
     <h2 class="cal-title">2026년 5월</h2>
     <div class="cal">
@@ -1016,8 +1115,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">학생 답을 받는다.</aside>
 </section>
 
-<!-- 34. 노동절 -->
-<section class="slide with-side" data-n="34" data-part="s2" data-layout="fact" data-title="노동절">
+<!-- 35. 노동절 -->
+<section class="slide with-side" data-n="35" data-part="s2" data-layout="fact" data-title="노동절">
   <div class="main-col">
     <p class="big">노동절</p>
     <p class="headline">근로자의 날 → 2026년부터 '노동절'</p>
@@ -1034,8 +1133,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">교과서 230쪽에는 '근로자의 날'로 나온다. 2025년 10월 법률 개정으로 2026년부터 이름이 '노동절'로 바뀌었고, 2026년 4월에 법정 공휴일로 지정되었다.</aside>
 </section>
 
-<!-- 35. 왜 5월 1일일까? -->
-<section class="slide with-side" data-n="35" data-part="s2" data-layout="fact" data-title="왜 5월 1일일까?">
+<!-- 36. 왜 5월 1일일까? -->
+<section class="slide with-side" data-n="36" data-part="s2" data-layout="fact" data-title="왜 5월 1일일까?">
   <div class="main-col">
     <h2 class="title">왜 하필 5월 1일일까?</h2>
     <p class="big">1886</p>
@@ -1048,16 +1147,21 @@ figure.ph.cl{position:absolute}
   <aside class="notes">진압 과정에서 많은 사람이 죽거나 다치고 체포되었다.</aside>
 </section>
 
-<!-- 36. 8시간 노동 만화 -->
-<section class="slide" data-n="36" data-part="s2" data-layout="photo-question" data-title="8시간 노동 만화">
+<!-- 37. 8시간 노동 만화 -->
+<section class="slide" data-n="37" data-part="s2" data-layout="photo-question" data-title="8시간 노동 만화">
   <figure class="ph pq-photo contain"><img src="images/eight-hours-cartoon.jpg" data-fit="contain" data-desc="1일 8시간 노동을 옹호하는 노동 신문의 만화" data-page="교과서 230쪽" alt="1일 8시간 노동을 옹호하는 노동 신문의 만화"></figure>
   <p class="caption pq-caption">1일 8시간 노동을 옹호하는 노동 신문의 만화</p>
   <div class="pq-side"><div class="placard small">하루 24시간을<br>셋으로 나눈다면?</div></div>
-  <aside class="notes">일하는 8시간, 쉬는 8시간, 하고 싶은 일을 하는 8시간. 만화 아래 영어(for WORK, for REST, for WHAT WE WILL)를 함께 읽는다.</aside>
+  <div class="a8 reveal">
+    <div><b>8시간</b><span>일하는 시간</span><i>for WORK</i></div>
+    <div><b>8시간</b><span>쉬는 시간</span><i>for REST</i></div>
+    <div><b>8시간</b><span>하고 싶은 일을 하는 시간</span><i>for WHAT WE WILL</i></div>
+  </div>
+  <aside class="notes">일하는 8시간, 쉬는 8시간, 하고 싶은 일을 하는 8시간. 만화 아래 영어(for WORK, for REST, for WHAT WE WILL)를 함께 읽는다. (다음 키를 누르면 답이 나온다)</aside>
 </section>
 
-<!-- 37. 산업 혁명 복습 (선택) -->
-<section class="slide with-side" data-n="37" data-part="s2" data-layout="points" data-optional="true" data-title="산업 혁명 복습">
+<!-- 38. 산업 혁명 복습 (선택) -->
+<section class="slide with-side" data-n="38" data-part="s2" data-layout="points" data-optional="true" data-title="산업 혁명 복습">
   <div class="main-col">
     <h2 class="title">산업 혁명기 노동자의 삶</h2>
     <ul class="points">
@@ -1073,11 +1177,15 @@ figure.ph.cl{position:absolute}
   <aside class="notes">앞 단원 복습. 화면을 보여 주기 전에 학생에게 먼저 물어도 좋다.</aside>
 </section>
 
-<!-- 38. 메이데이 -->
-<section class="slide with-side" data-n="38" data-part="s2" data-layout="fact" data-title="메이데이">
+<!-- 39. 메이데이 -->
+<section class="slide with-side" data-n="39" data-part="s2" data-layout="fact" data-title="메이데이">
   <div class="main-col">
     <p class="big">1889</p>
     <p class="desc">프랑스 파리에서 세계의 노동자들이 5월 1일을 '메이데이'로 정했다</p>
+    <div class="why">
+      <p class="why-q">왜 메이데이를 정했을까?</p>
+      <p class="why-a">1886년 5월 1일, 하루 8시간 노동을 요구한 미국 시카고 노동자들의 운동을 기리기 위해서였다. 진압 과정에서 많은 사람이 죽거나 다치고 체포되었다.</p>
+    </div>
   </div>
   <div class="side-col">
     <figure class="ph"><img src="images/mayday-1890s.jpg" data-desc="초기 메이데이 집회 (1890년대)" data-page="추가 요청 사진" alt="초기 메이데이 집회"></figure>
@@ -1086,8 +1194,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">미국 노동자들의 8시간 노동 운동을 기리기 위해서였다.</aside>
 </section>
 
-<!-- 39. 노동조합 -->
-<section class="slide with-side" data-n="39" data-part="s2" data-layout="points" data-title="노동조합">
+<!-- 40. 노동조합 -->
+<section class="slide with-side" data-n="40" data-part="s2" data-layout="points" data-title="노동조합">
   <div class="main-col">
     <h2 class="title">노동자들은 어떻게 권리를 지켰을까?</h2>
     <ul class="points">
@@ -1107,8 +1215,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">노동자 한 명이 회사와 대등하게 이야기하기는 어렵기 때문이다. 오른쪽은 교과서 231쪽 탐구 자료(바이마르 헌법).</aside>
 </section>
 
-<!-- 40. 단체 교섭권 -->
-<section class="slide with-side" data-n="40" data-part="s2" data-layout="term" data-title="단체 교섭권">
+<!-- 41. 단체 교섭권 -->
+<section class="slide with-side" data-n="41" data-part="s2" data-layout="term" data-title="단체 교섭권">
   <div class="main-col">
     <div class="term-block">
       <p class="term">단체 교섭권</p>
@@ -1123,8 +1231,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">'스스로 확인하기' 빈칸 정답은 '단체'. 오른쪽은 교과서 231쪽 탐구 자료(와그너법).</aside>
 </section>
 
-<!-- 41. 국제 노동 기구 -->
-<section class="slide with-side" data-n="41" data-part="s2" data-layout="fact" data-title="국제 노동 기구">
+<!-- 42. 국제 노동 기구 -->
+<section class="slide with-side" data-n="42" data-part="s2" data-layout="fact" data-title="국제 노동 기구">
   <div class="main-col">
     <p class="big">1919</p>
     <p class="headline">국제 노동 기구(ILO) 설립</p>
@@ -1136,8 +1244,8 @@ figure.ph.cl{position:absolute}
   </div>
 </section>
 
-<!-- 42. 요구가 제도로 -->
-<section class="slide" data-n="42" data-part="s2" data-layout="timeline" data-title="요구가 제도로">
+<!-- 43. 요구가 제도로 -->
+<section class="slide" data-n="43" data-part="s2" data-layout="timeline" data-title="요구가 제도로">
   <div class="tl strong">
     <div class="tl-year c1">1886</div>
     <div class="tl-dot c1"></div>
@@ -1152,8 +1260,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">운동이 제도로 바뀐 가장 선명한 사례. 이 화살표를 손으로 짚으며 강조한다.</aside>
 </section>
 
-<!-- 43. 필라델피아 선언 · 사진이 없으면 사진 자리가 숨겨진다 -->
-<section class="slide with-side" data-n="43" data-part="s2" data-layout="fact" data-title="필라델피아 선언">
+<!-- 44. 필라델피아 선언 · 사진이 없으면 사진 자리가 숨겨진다 -->
+<section class="slide with-side" data-n="44" data-part="s2" data-layout="fact" data-title="필라델피아 선언">
   <div class="main-col">
     <p class="big">1944</p>
     <p class="headline">필라델피아 선언</p>
@@ -1166,21 +1274,21 @@ figure.ph.cl{position:absolute}
   <aside class="notes">'스스로 확인하기' 빈칸 정답은 '필라델피아'.</aside>
 </section>
 
-<!-- 44. 노동은 상품이 아니다 -->
-<section class="slide" data-n="44" data-part="s2" data-layout="big-sentence" data-title="노동은 상품이 아니다">
+<!-- 45. 노동은 상품이 아니다 -->
+<section class="slide" data-n="45" data-part="s2" data-layout="big-sentence" data-title="노동은 상품이 아니다">
   <p class="bs huge">노동은 상품이 아니다.</p>
   <p class="caption bs-note">필라델피아 선언 제1부</p>
   <aside class="notes">"이 말은 무슨 뜻일까요?" → 노동자를 돈을 버는 도구로만 대해서는 안 된다는 뜻.</aside>
 </section>
 
-<!-- 45. 핵심 질문 (판서) -->
-<section class="slide" data-n="45" data-part="s2" data-layout="placard" data-board="true" data-title="핵심 질문">
+<!-- 46. 핵심 질문 (판서) -->
+<section class="slide" data-n="46" data-part="s2" data-layout="placard" data-board="true" data-title="핵심 질문">
   <div class="placard">일하는 사람이 인간답게 살려면<br>무엇이 필요할까?</div>
   <aside class="notes">이 이야기에서 학생 답을 기다리는 질문. 적정한 노동 시간, 최저 임금, 안전한 작업장, 노동조합 같은 답을 받고 필라델피아 선언 제3부(4항 노동 시간과 최저 생활 임금, 7항 노동자의 생명과 건강 보호)와 연결한다. ✏️ 판서: 노동 행.</aside>
 </section>
 
-<!-- 46. 지금도 계속된다 (선택) -->
-<section class="slide" data-n="46" data-part="s2" data-layout="photo" data-optional="true" style="--photo-w:900px" data-title="지금도 계속된다">
+<!-- 47. 지금도 계속된다 (선택) -->
+<section class="slide" data-n="47" data-part="s2" data-layout="photo" data-optional="true" style="--photo-w:900px" data-title="지금도 계속된다">
   <figure class="ph photo-main contain"><img src="images/ilo-poster.jpg" data-fit="contain" data-desc="세계 산재 사망 노동자 추모의 날 포스터" data-page="교과서 230쪽" alt="세계 산재 사망 노동자 추모의 날 포스터"></figure>
   <div class="photo-side">
     <h2 class="title">지금도 계속된다</h2>
@@ -1190,18 +1298,18 @@ figure.ph.cl{position:absolute}
   <aside class="notes">국제 자유 노동조합 연맹(ICFTU)이 지정했다. 산업 현장이 다양해지면서 위험한 상황에 놓이는 노동자가 늘고 있다.</aside>
 </section>
 
-<!-- 47. 이야기 ② 정리 -->
-<section class="slide" data-n="47" data-part="s2" data-layout="summary" data-fill="민권, 여성, 노동" data-highlight="노동" data-title="이야기 ② 정리">
+<!-- 48. 이야기 ② 정리 -->
+<section class="slide" data-n="48" data-part="s2" data-layout="summary" data-fill="민권, 여성, 노동" data-highlight="노동" data-title="이야기 ② 정리">
   <h2 class="title">이야기 ② 정리</h2>
   <div class="sum-holder"></div>
 </section>
 
 <!-- ==========================================================
-     이야기 ③ 인류의 생존을 위협하는 문제는 어떻게 해결할까? · 48–70 · 28–42분
+     이야기 ③ 인류의 생존을 위협하는 문제는 어떻게 해결할까? · 49–71 · 28–42분
      ========================================================== -->
 
-<!-- 48. 구분 화면 -->
-<section class="slide" data-n="48" data-part="s3" data-layout="roadmap" data-title="구분 화면">
+<!-- 49. 구분 화면 -->
+<section class="slide" data-n="49" data-part="s3" data-layout="roadmap" data-title="구분 화면">
   <p class="rm-target teacher">목표 28분</p>
   <div class="rm-cards">
     <div class="rm-card s1 off"><figure class="ph"><img src="images/king-march.jpg" data-focus="15% 45%" data-desc="연설하는 마틴 루서 킹과 군중" data-page="교과서 228쪽" alt=""></figure><div class="rm-body"><div class="rm-num">1</div><p class="rm-q">사람은 누구나 평등한가?</p><p class="rm-mv">민권 운동 · 여성 운동</p></div></div>
@@ -1210,10 +1318,10 @@ figure.ph.cl{position:absolute}
   </div>
 </section>
 
-<!-- ───────── 반전 평화 운동 (49–57) ───────── -->
+<!-- ───────── 반전 평화 운동 (50–58) ───────── -->
 
-<!-- 49. 베트남 전쟁 (선택) · 지도가 없으면 지도 자리가 숨겨진다 -->
-<section class="slide with-side" data-n="49" data-part="s3" data-layout="fact" data-optional="true" data-title="베트남 전쟁">
+<!-- 50. 베트남 전쟁 (선택) · 지도가 없으면 지도 자리가 숨겨진다 -->
+<section class="slide with-side" data-n="50" data-part="s3" data-layout="fact" data-optional="true" data-title="베트남 전쟁">
   <div class="main-col">
     <p class="big">베트남 전쟁</p>
     <p class="headline">1964~1975</p>
@@ -1225,20 +1333,20 @@ figure.ph.cl{position:absolute}
   <aside class="notes">앞 단원의 냉전 내용을 짧게 복습한다.</aside>
 </section>
 
-<!-- 50. 반전 시위 -->
-<section class="slide" data-n="50" data-part="s3" data-layout="photo" data-title="반전 시위">
+<!-- 51. 반전 시위 -->
+<section class="slide" data-n="51" data-part="s3" data-layout="photo" data-title="반전 시위">
   <figure class="ph photo-main"><img src="images/vietnam-protest.jpg" data-focus="50% 30%" data-desc="베트남 전쟁 반대 시위 (미국)" data-page="교과서 232쪽" alt="베트남 전쟁 반대 시위"></figure>
   <div class="photo-side"><p class="caption">베트남 전쟁 반대 시위 (미국)</p></div>
 </section>
 
-<!-- 51. 질문 -->
-<section class="slide" data-n="51" data-part="s3" data-layout="placard" data-title="질문">
+<!-- 52. 질문 -->
+<section class="slide" data-n="52" data-part="s3" data-layout="placard" data-title="질문">
   <div class="placard">전쟁은 정부가 결정하는데,<br>시민이 바꿀 수 있을까?</div>
   <aside class="notes">1~2명의 답만 짧게 받는다.</aside>
 </section>
 
-<!-- 52. 결과 -->
-<section class="slide with-side" data-n="52" data-part="s3" data-layout="points" data-title="결과">
+<!-- 53. 결과 -->
+<section class="slide with-side" data-n="53" data-part="s3" data-layout="points" data-title="결과">
   <div class="main-col">
     <h2 class="title">1960년대 후반</h2>
     <ul class="points">
@@ -1253,15 +1361,15 @@ figure.ph.cl{position:absolute}
   <aside class="notes">군대를 보낸 미국뿐 아니라 여러 나라에서 반전 평화 운동이 일어났다.</aside>
 </section>
 
-<!-- 53. 핵 실험 반대 -->
-<section class="slide" data-n="53" data-part="s3" data-layout="photo" data-title="핵 실험 반대">
+<!-- 54. 핵 실험 반대 -->
+<section class="slide" data-n="54" data-part="s3" data-layout="photo" data-title="핵 실험 반대">
   <figure class="ph photo-main"><img src="images/nuclear-test-protest.jpg" data-desc="핵 실험 반대 시위" data-page="교과서 232쪽" alt="핵 실험 반대 시위"></figure>
   <div class="photo-side"><p class="caption">핵 실험 반대 시위</p></div>
   <p class="body photo-line">대량 살상 무기는 인류의 생존을 위협한다</p>
 </section>
 
-<!-- 54. 핵 확산 금지 조약 -->
-<section class="slide with-side" data-n="54" data-part="s3" data-layout="term" data-title="핵 확산 금지 조약">
+<!-- 55. 핵 확산 금지 조약 -->
+<section class="slide with-side" data-n="55" data-part="s3" data-layout="term" data-title="핵 확산 금지 조약">
   <div class="main-col">
     <div class="term-block">
       <p class="term">핵 확산 금지 조약(NPT)</p>
@@ -1276,8 +1384,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">1968년 체결, 1970년 발효(교과서에는 연도가 없다). '스스로 확인하기' 빈칸 정답은 '핵'.</aside>
 </section>
 
-<!-- 55. 2003 -->
-<section class="slide" data-n="55" data-part="s3" data-layout="photo" style="--photo-w:1240px" data-title="2003">
+<!-- 56. 2003 -->
+<section class="slide" data-n="56" data-part="s3" data-layout="photo" style="--photo-w:1240px" data-title="2003">
   <figure class="ph photo-main"><img src="images/iraq-protest-2003.jpg" data-desc="이라크 전쟁 반대 운동 (이탈리아)" data-page="교과서 232쪽" alt="이라크 전쟁 반대 운동"></figure>
   <div class="photo-side">
     <p class="big">2003</p>
@@ -1285,8 +1393,8 @@ figure.ph.cl{position:absolute}
   </div>
 </section>
 
-<!-- 56. 2022 -->
-<section class="slide" data-n="56" data-part="s3" data-layout="photo" style="--photo-w:1240px" data-title="2022">
+<!-- 57. 2022 -->
+<section class="slide" data-n="57" data-part="s3" data-layout="photo" style="--photo-w:1240px" data-title="2022">
   <figure class="ph photo-main"><img src="images/ukraine-protest-2022.jpg" data-desc="러시아의 우크라이나 침공 반대 시위 (오스트레일리아)" data-page="교과서 232쪽" alt="러시아의 우크라이나 침공 반대 시위"></figure>
   <div class="photo-side">
     <p class="big">2022</p>
@@ -1294,17 +1402,17 @@ figure.ph.cl{position:absolute}
   </div>
 </section>
 
-<!-- 57. 생각할 점 (판서) -->
-<section class="slide" data-n="57" data-part="s3" data-layout="big-sentence" data-board="true" data-title="생각할 점">
+<!-- 58. 생각할 점 (판서) -->
+<section class="slide" data-n="58" data-part="s3" data-layout="big-sentence" data-board="true" data-title="생각할 점">
   <p class="bs">시위가 늘 전쟁을 바로 멈추지는 못한다.</p>
   <p class="bs accent">그래도 평화를 요구하는 목소리와 연대는 계속된다.</p>
   <aside class="notes">베트남 사례만 보고 "시위하면 전쟁이 끝난다"로 단순화하지 않게 한다. ✏️ 판서: 반전 평화 행.</aside>
 </section>
 
-<!-- ───────── 환경 운동 (58–69) ───────── -->
+<!-- ───────── 환경 운동 (59–70) ───────── -->
 
-<!-- 58. 대표적인 환경 문제 -->
-<section class="slide" data-n="58" data-part="s3" data-layout="icons" data-title="대표적인 환경 문제">
+<!-- 59. 대표적인 환경 문제 -->
+<section class="slide" data-n="59" data-part="s3" data-layout="icons" data-title="대표적인 환경 문제">
   <h2 class="title">대표적인 환경 문제</h2>
   <p class="caption icons-sub">산업화와 인구 증가로 자원 소비량과 폐기물의 양이 급증했다</p>
   <div class="icons four">
@@ -1328,8 +1436,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">산업화와 인구 증가로 자원 소비와 폐기물이 급증했다. 그 결과 생태계의 균형이 깨지고 지구의 자정 능력이 약해졌다.</aside>
 </section>
 
-<!-- 59. 아랄해는 어디에? -->
-<section class="slide" data-n="59" data-part="s3" data-layout="photo" data-title="아랄해는 어디에?">
+<!-- 60. 아랄해는 어디에? -->
+<section class="slide" data-n="60" data-part="s3" data-layout="photo" data-title="아랄해는 어디에?">
   <figure class="ph photo-main contain"><img src="images/aral-map.png" data-fit="contain" data-desc="아랄해 위치 지도" data-page="교과서 233쪽 지구본 그림 또는 교사가 준비" alt="아랄해 위치 지도"></figure>
   <div class="photo-side">
     <h2 class="title">아랄해</h2>
@@ -1338,8 +1446,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">한때 세계에서 네 번째로 큰 호수였다.</aside>
 </section>
 
-<!-- 60. 1989 · 사진 틀이 61번 비교 화면과 같은 크기·위치다 -->
-<section class="slide aral-frame" data-n="60" data-part="s3" data-layout="photo" data-title="1989">
+<!-- 61. 1989 · 사진 틀이 62번 비교 화면과 같은 크기·위치다 -->
+<section class="slide aral-frame" data-n="61" data-part="s3" data-layout="photo" data-title="1989">
   <figure class="ph photo-main"><img src="images/aral-1989.jpg" data-aspect-source data-desc="아랄해 위성 사진 (1989)" data-page="교과서 233쪽 또는 NASA Earth Observatory" alt="1989년의 아랄해 위성 사진"></figure>
   <div class="photo-side">
     <p class="big">1989</p>
@@ -1347,8 +1455,8 @@ figure.ph.cl{position:absolute}
   </div>
 </section>
 
-<!-- 61. 비교 · 가운데 손잡이를 끌면 경계가 움직인다 -->
-<section class="slide" data-n="61" data-part="s3" data-layout="compare" data-title="비교">
+<!-- 62. 비교 · 가운데 손잡이를 끌면 경계가 움직인다 -->
+<section class="slide" data-n="62" data-part="s3" data-layout="compare" data-title="비교">
   <div class="cmp-labels"><span>1989</span><span>2008</span></div>
   <div class="compare" data-interactive>
     <figure class="ph cmp-base"><img src="images/aral-2008.jpg" data-desc="아랄해 위성 사진 (2008)" data-page="교과서 233쪽 또는 NASA Earth Observatory" alt="2008년의 아랄해 위성 사진"></figure>
@@ -1359,8 +1467,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">학생 한 명이 직접 나와서 끌어 보게 해도 좋다.</aside>
 </section>
 
-<!-- 62. 원인 -->
-<section class="slide with-side" data-n="62" data-part="s3" data-layout="points" data-title="원인">
+<!-- 63. 원인 -->
+<section class="slide with-side" data-n="63" data-part="s3" data-layout="points" data-title="원인">
   <div class="main-col">
     <h2 class="title">왜 줄어들었을까?</h2>
     <ul class="points">
@@ -1375,22 +1483,22 @@ figure.ph.cl{position:absolute}
   <aside class="notes">1960년대 소련 시기부터 아무다리야강과 시르다리야강의 물을 관개에 끌어 썼다. 지구 온난화가 주된 원인이 아니라는 점에 유의한다. 교과서도 '사막화'의 사례로 제시한다. 드러난 호수 바닥의 소금 먼지는 주변 주민의 건강과 농업에 피해를 주었다.</aside>
 </section>
 
-<!-- 63. 황사 -->
-<section class="slide" data-n="63" data-part="s3" data-layout="photo-question" data-title="황사">
+<!-- 64. 황사 -->
+<section class="slide" data-n="64" data-part="s3" data-layout="photo-question" data-title="황사">
   <figure class="ph pq-photo"><img src="images/yellow-dust.jpg" data-desc="한반도 쪽으로 이동하는 황사 위성 사진" data-page="NASA Earth Observatory 또는 기상청" alt="황사 위성 사진"></figure>
   <p class="caption pq-caption">봄철 황사 위성 사진</p>
   <div class="pq-side"><div class="placard small">사막화가<br>우리와<br>상관있을까?</div></div>
   <aside class="notes">중국과 몽골의 사막·건조 지역 먼지가 바람을 타고 한반도까지 온다. 환경 문제는 국경을 넘는다.</aside>
 </section>
 
-<!-- 64. 핵심 질문 -->
-<section class="slide" data-n="64" data-part="s3" data-layout="placard" data-title="핵심 질문">
+<!-- 65. 핵심 질문 -->
+<section class="slide" data-n="65" data-part="s3" data-layout="placard" data-title="핵심 질문">
   <div class="placard">환경 문제는 한 나라의<br>노력만으로 해결할 수 있을까?</div>
   <aside class="notes">이 이야기에서 학생 답을 기다리는 질문. 답을 받은 뒤 "그래서 여러 나라가 함께 약속을 만들었습니다."</aside>
 </section>
 
-<!-- 65. 리우 선언 -->
-<section class="slide with-side" data-n="65" data-part="s3" data-layout="fact" data-title="리우 선언">
+<!-- 66. 리우 선언 -->
+<section class="slide with-side" data-n="66" data-part="s3" data-layout="fact" data-title="리우 선언">
   <div class="main-col">
     <p class="big">1992</p>
     <p class="headline">환경과 개발에 관한 공동 선언 (리우 선언)</p>
@@ -1405,8 +1513,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">'스스로 확인하기' 빈칸 정답은 '리우 선언'. 생물 다양성 협약, 사막화 방지 협약, 기후 변화 협약 등도 체결되었다.</aside>
 </section>
 
-<!-- 66. 교토 의정서 -->
-<section class="slide with-side" data-n="66" data-part="s3" data-layout="fact" data-title="교토 의정서">
+<!-- 67. 교토 의정서 -->
+<section class="slide with-side" data-n="67" data-part="s3" data-layout="fact" data-title="교토 의정서">
   <div class="main-col">
     <p class="big">1997</p>
     <p class="headline">교토 의정서</p>
@@ -1420,8 +1528,8 @@ figure.ph.cl{position:absolute}
   <aside class="notes">교과서 탐구 ㉠의 정답은 '온실가스'. 1990년 수준보다 평균 5.2% 감축. 한국은 당시 개발 도상국으로 분류되어 감축 의무에서 빠졌다.</aside>
 </section>
 
-<!-- 67. 파리 협정 (판서) · 66번에서 넘어오면 원이 커진다 -->
-<section class="slide with-side" data-n="67" data-part="s3" data-layout="fact" data-board="true" data-title="파리 협정">
+<!-- 68. 파리 협정 (판서) · 67번에서 넘어오면 원이 커진다 -->
+<section class="slide with-side" data-n="68" data-part="s3" data-layout="fact" data-board="true" data-title="파리 협정">
   <div class="main-col">
     <p class="big">2015</p>
     <p class="headline">파리 협정</p>
@@ -1432,12 +1540,12 @@ figure.ph.cl{position:absolute}
       <li>2023년 이후 5년마다 감축 목표를 높여 제출 및 검증</li>
     </ul>
   </div>
-  <div class="side-col"><div class="diagram"><div class="circle big-circle" data-grow-from="66">선진국 +<br>개발 도상국</div></div></div>
+  <div class="side-col"><div class="diagram"><div class="circle big-circle" data-grow-from="67">선진국 +<br>개발 도상국</div></div></div>
   <aside class="notes">핵심은 '함께하는 나라가 늘었다'. 참고: 교과서 탐구의 '한국 37% 감축안'은 2015년 제출안이고, 한국은 2021년에 2030년 목표를 2018년 대비 40% 감축으로 높였다. 미국은 2025년 1월 파리 협정 탈퇴를 발표했고 2026년 1월 탈퇴가 발효되었다. 학생이 물으면 '아직 남은 과제'의 예로 다룬다. ✏️ 판서: 환경 행.</aside>
 </section>
 
-<!-- 68. 그린피스 -->
-<section class="slide" data-n="68" data-part="s3" data-layout="photo" data-title="그린피스">
+<!-- 69. 그린피스 -->
+<section class="slide" data-n="69" data-part="s3" data-layout="photo" data-title="그린피스">
   <figure class="ph photo-main"><img src="images/greenpeace.jpg" data-desc="그린피스 선박" data-page="교과서 233쪽" alt="그린피스 선박"></figure>
   <div class="photo-side">
     <p class="caption">그린피스 (1971년 설립)</p>
@@ -1447,31 +1555,31 @@ figure.ph.cl{position:absolute}
   <aside class="notes">핵 실험 반대와 자연 보호 활동을 함께 해 왔다. 반전 평화 운동과도 이어진다.</aside>
 </section>
 
-<!-- 69. 세계 시민 (선택) -->
-<section class="slide" data-n="69" data-part="s3" data-layout="placard" data-optional="true" data-title="세계 시민">
+<!-- 70. 세계 시민 (선택) -->
+<section class="slide" data-n="70" data-part="s3" data-layout="placard" data-optional="true" data-title="세계 시민">
   <div class="placard">세계 시민으로서 나는<br>무엇을 할 수 있을까?</div>
   <aside class="notes">1~2명. 교과서 233쪽 탐구 2번(일상생활에서 실천할 수 있는 방법)과 연결한다.</aside>
 </section>
 
-<!-- 70. 이야기 ③ 정리 -->
-<section class="slide" data-n="70" data-part="s3" data-layout="summary" data-fill="전부" data-highlight="반전 평화, 환경" data-title="이야기 ③ 정리">
+<!-- 71. 이야기 ③ 정리 -->
+<section class="slide" data-n="71" data-part="s3" data-layout="summary" data-fill="전부" data-highlight="반전 평화, 환경" data-title="이야기 ③ 정리">
   <h2 class="title">이야기 ③ 정리</h2>
   <div class="sum-holder"></div>
 </section>
 
 <!-- ==========================================================
-     정리 · 71–77 · 42–45분
+     정리 · 72–78 · 42–45분
      ========================================================== -->
 
-<!-- 71. 다섯 운동 한눈에 보기 -->
-<section class="slide" data-n="71" data-part="outro" data-layout="summary" data-fill="전부" data-highlight="" data-title="다섯 운동 한눈에 보기">
+<!-- 72. 다섯 운동 한눈에 보기 -->
+<section class="slide" data-n="72" data-part="outro" data-layout="summary" data-fill="전부" data-highlight="" data-title="다섯 운동 한눈에 보기">
   <h2 class="title">다섯 운동 한눈에 보기</h2>
   <p class="sum-target teacher">목표 42분</p>
   <div class="sum-holder"></div>
 </section>
 
-<!-- 72. 다시, 공통점 -->
-<section class="slide" data-n="72" data-part="outro" data-layout="collage" data-title="다시, 공통점">
+<!-- 73. 다시, 공통점 -->
+<section class="slide" data-n="73" data-part="outro" data-layout="collage" data-title="다시, 공통점">
   <figure class="ph cl cl-a"><img src="images/king-march.jpg" data-desc="연설하는 마틴 루서 킹과 군중" data-page="교과서 228쪽" alt="연설하는 마틴 루서 킹과 군중"></figure>
   <figure class="ph cl cl-b"><img src="images/uk-women-1971.jpg" data-desc="행진하는 영국 여성들 (1971)" data-page="교과서 229쪽" alt="행진하는 영국 여성들"></figure>
   <figure class="ph cl cl-c"><img src="images/eight-hours-cartoon.jpg" data-desc="1일 8시간 노동을 옹호하는 노동 신문의 만화" data-page="교과서 230쪽" alt="1일 8시간 노동을 옹호하는 노동 신문의 만화"></figure>
@@ -1482,7 +1590,7 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- ==========================================================
-     패턴 데이터 · 73–76번이 이 네 단계를 함께 쓴다.
+     패턴 데이터 · 74–77번이 이 네 단계를 함께 쓴다.
      문구는 여기서만 고친다. 각 장의 data-step 값(1~4)까지만 보인다.
      ========================================================== -->
 <template id="pattern-data">
@@ -1498,22 +1606,22 @@ figure.ph.cl{position:absolute}
   </div>
 </template>
 
-<!-- 73. 패턴 1 -->
-<section class="slide" data-n="73" data-part="outro" data-layout="pattern" data-step="1" data-title="패턴 1"></section>
+<!-- 74. 패턴 1 -->
+<section class="slide" data-n="74" data-part="outro" data-layout="pattern" data-step="1" data-title="패턴 1"></section>
 
-<!-- 74. 패턴 2 -->
-<section class="slide" data-n="74" data-part="outro" data-layout="pattern" data-step="2" data-title="패턴 2"></section>
+<!-- 75. 패턴 2 -->
+<section class="slide" data-n="75" data-part="outro" data-layout="pattern" data-step="2" data-title="패턴 2"></section>
 
-<!-- 75. 패턴 3 -->
-<section class="slide" data-n="75" data-part="outro" data-layout="pattern" data-step="3" data-title="패턴 3"></section>
+<!-- 76. 패턴 3 -->
+<section class="slide" data-n="76" data-part="outro" data-layout="pattern" data-step="3" data-title="패턴 3"></section>
 
-<!-- 76. 패턴 4 -->
-<section class="slide" data-n="76" data-part="outro" data-layout="pattern" data-step="4" data-title="패턴 4">
+<!-- 77. 패턴 4 -->
+<section class="slide" data-n="77" data-part="outro" data-layout="pattern" data-step="4" data-title="패턴 4">
   <aside class="notes">"이 네 번째 칸은 아직 끝나지 않았어요."</aside>
 </section>
 
-<!-- 77. 오늘의 핵심 정리 -->
-<section class="slide" data-n="77" data-part="outro" data-layout="big-sentence" data-title="오늘의 핵심 정리">
+<!-- 78. 오늘의 핵심 정리 -->
+<section class="slide" data-n="78" data-part="outro" data-layout="big-sentence" data-title="오늘의 핵심 정리">
   <p class="bs">민주주의와 인권은 사람들의 노력으로 확대되었으며,</p>
   <p class="bs">그 노력은 지금도 계속되고 있다.</p>
   <aside class="notes">학생들과 함께 소리 내어 읽고 마친다.</aside>
@@ -1522,16 +1630,36 @@ figure.ph.cl{position:absolute}
 </main>
 
 <div id="sweep" aria-hidden="true"><span></span></div>
-<div id="footer" aria-hidden="true"><span id="digits"></span><span id="motionflag">움직임 끔</span><span id="skipflag">선택 장 건너뜀</span><span id="pageno"></span></div>
+<div id="footer" aria-hidden="true"><span id="digits"></span><span id="stepflag">▸ 답</span><span id="motionflag">움직임 끔</span><span id="skipflag">선택 장 건너뜀</span><span id="pageno"></span></div>
 <div id="notes-panel"><div id="notes-head"></div><div id="notes-body"></div></div>
 <div id="overview"><p class="ov-head">전체 장 목록 · 누르면 그 장으로 이동 · Esc로 닫기 · 흐린 장은 선택 장</p><div class="ov-grid"></div></div>
 
 </div>
 </div>
 
+<div id="edit-bar" role="toolbar" aria-label="편집 도구">
+  <b>편집 중</b><span class="hint">글자를 눌러 고친다 · Enter 줄바꿈 · Esc 고치기 끝</span>
+  <button type="button" data-act="prev">◀ 이전 장</button><button type="button" data-act="next">다음 장 ▶</button>
+  <button type="button" data-act="notes">메모 (N)</button>
+  <span id="edit-count"></span>
+  <button type="button" data-act="save" class="primary">저장 (Ctrl+S)</button>
+  <button type="button" data-act="close">편집 끝 (E)</button>
+</div>
+<button type="button" id="edit-btn" title="편집 (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 4.5l4 4L8 20H4v-4z"/><path d="M13 7l4 4"/></svg>편집</button>
+<div id="toast" role="status"></div>
+
 <script>
 (function () {
   'use strict';
+
+  // 편집 저장용 원본: 스크립트가 화면을 바꾸기 전의 문서를 그대로 복사해 둔다
+  var pristine = document.documentElement.cloneNode(true);
+  var EDIT_SEL = '.cover-sub, .cover-title, .cover-pages, .title, .big, .headline, .desc, .body, .caption, .placard, .rm-q, .rm-mv, .rm-target, .sum-target, ' +
+    '.term, .def, .tl-year, .tl-text, .tl-gap, .bn-side, .bn-main, .bs, .points li, .facts-list li, .chips span, .icons figcaption, .instruction, #speech, ' +
+    '.cal-title, .tc-top, .tc-day, .tc-week, .tc-label, .st2-y, .st2-t, .doc-y, .doc-q, .circle, .cmp-labels span, .ct-head, .ct-item, .ct-foot, ' +
+    '.ans-text, .ans-sub, .a8 b, .a8 span, .a8 i, .why-q, .why-a';
+  var editLive = Array.prototype.slice.call(document.getElementById('deck').querySelectorAll(EDIT_SEL));
+  var editOrig = Array.prototype.slice.call(pristine.querySelector('#deck').querySelectorAll(EDIT_SEL));
 
   var stage = document.getElementById('stage');
   var deck = document.getElementById('deck');
@@ -1580,7 +1708,7 @@ figure.ph.cl{position:absolute}
     each(document.querySelectorAll('[data-same-as="speech"]'), function (box) { box.innerHTML = src.innerHTML; });
   }
 
-  /* ---------- 31·47·70·71 정리표 ---------- */
+  /* ---------- 32·48·71·72 정리표 ---------- */
   function buildSummary() {
     var tpl = document.getElementById('summary-data');
     if (!tpl) return;
@@ -1609,6 +1737,36 @@ figure.ph.cl{position:absolute}
     });
   }
 
+  /* ---------- 사진 틀을 사진의 가로세로 비율에 맞춘다 (사진이 잘리지 않게) ----------
+     사진 장·사진과 질문 장·오른쪽 사진 단만. 콜라주·카드·패턴의 작은 사진은 틀에 맞춰 잘린다 */
+  function fitFrames() {
+    each(deck.querySelectorAll('figure.ph > img'), function (img) {
+      var fig = img.parentNode, slide = fig.closest('.slide');
+      if (img.hasAttribute('data-aspect-source') || img.hasAttribute('data-zoom')) return;
+      var side = fig.parentNode.classList.contains('side-col');
+      var grid = fig.classList.contains('photo-main') || fig.classList.contains('pq-photo');
+      if (!side && !grid) return;
+      fig.style.width = ''; fig.style.height = '';
+      if (side) fig.parentNode.style.width = '';
+      else { slide.style.removeProperty('--fit-w'); slide.classList.remove('fitted'); }
+      if (!img.naturalWidth || fig.classList.contains('missing') || fig.classList.contains('gone')) return;
+      var r = img.naturalWidth / img.naturalHeight;
+      var maxW = side ? 860 : fig.offsetWidth, maxH = side ? 760 : fig.offsetHeight;
+      var w = Math.round(Math.min(maxW, maxH * r)), h = Math.round(w / r);
+      fig.style.width = w + 'px';
+      fig.style.height = h + 'px';
+      if (side) fig.parentNode.style.width = Math.max(w, 520) + 'px';
+      else { slide.style.setProperty('--fit-w', w + 'px'); slide.classList.add('fitted'); }
+    });
+  }
+  var fitPending = false;
+  function scheduleFit() {
+    if (fitPending) return;
+    fitPending = true;
+    requestAnimationFrame(function () { fitPending = false; fitAll(); });
+  }
+  function fitAll() { fitFrames(); fitSummary(); fitColumns(); }
+
   /* 두 단 장의 왼쪽 글이 무대보다 길면 글자를 한 단계 줄인다 */
   function fitColumns() {
     each(deck.querySelectorAll('.main-col'), function (col) {
@@ -1617,7 +1775,7 @@ figure.ph.cl{position:absolute}
     });
   }
 
-  /* ---------- 73–76 패턴 ---------- */
+  /* ---------- 74–77 패턴 ---------- */
   function buildPattern() {
     var tpl = document.getElementById('pattern-data');
     if (!tpl) return;
@@ -1634,7 +1792,7 @@ figure.ph.cl{position:absolute}
   }
 
   /* ---------- 움직임 준비: 단어 나누기, 순서 번호, 선 길이, 군중 피켓 ---------- */
-  function prepareMotion() {
+  function splitWords() {
     // 큰 문장은 단어마다 하나씩 나타난다
     each(deck.querySelectorAll('.bs'), function (p) {
       if (p.children.length) return;
@@ -1649,8 +1807,20 @@ figure.ph.cl{position:absolute}
         if (i < words.length - 1) p.appendChild(document.createTextNode(' '));
       });
     });
+  }
+  function markCounts() {
+    // 숫자가 올라가는 큰 숫자
+    each(deck.querySelectorAll('.big, .tl-year, .tl-gap, .bn-main, .bn-side'), function (el) {
+      var t = el.textContent.trim();
+      if (/^\d{2,4}(년)?$/.test(t)) el.setAttribute('data-final', t);
+      else el.removeAttribute('data-final');
+    });
+  }
+  function prepareMotion() {
+    splitWords();
+    markCounts();
     // 순서대로 나타나는 요소에 번호를 붙인다
-    each(deck.querySelectorAll('.points, .facts-list, .chips, .icons'), function (list) {
+    each(deck.querySelectorAll('.points, .facts-list, .chips, .icons, .ct-list, .a8'), function (list) {
       each(list.children, function (el, i) { el.style.setProperty('--i', i); });
     });
     each(deck.querySelectorAll('.cal'), function (cal) {
@@ -1658,11 +1828,6 @@ figure.ph.cl{position:absolute}
     });
     // 아이콘 선이 그려지도록 길이를 1로 맞춘다
     each(deck.querySelectorAll('.icons svg *'), function (el) { el.setAttribute('pathLength', '1'); });
-    // 숫자가 올라가는 큰 숫자
-    each(deck.querySelectorAll('.big, .tl-year, .tl-gap, .bn-main, .bn-side'), function (el) {
-      var t = el.textContent.trim();
-      if (/^\d{2,4}(년)?$/.test(t)) el.setAttribute('data-final', t);
-    });
     // 피켓 장 뒤쪽의 군중 피켓
     var spots = [
       [3, 360, 250, 170, -7, .05, 3.1], [14, 470, 200, 140, 5, .18, 2.7], [-1, 640, 300, 190, 4, .3, 3.4],
@@ -1728,11 +1893,13 @@ figure.ph.cl{position:absolute}
         box.children[1].textContent = img.getAttribute('data-desc') || '';
         box.children[2].textContent = img.getAttribute('data-page') || '';
         fig.appendChild(box);
+        scheduleFit();
       }
       function ok() {
         fig.classList.remove('missing', 'gone');
         var box = fig.querySelector('.ph-box');
         if (box) fig.removeChild(box);
+        scheduleFit();
       }
       img.addEventListener('error', fail);
       img.addEventListener('load', ok);
@@ -1751,7 +1918,7 @@ figure.ph.cl{position:absolute}
     });
   }
 
-  /* ---------- 61 비교 슬라이더 ---------- */
+  /* ---------- 62 비교 슬라이더 ---------- */
   var hintFrame = null;
   function setPos(c, p) { c.style.setProperty('--pos', p + '%'); }
   function stopHint() { if (hintFrame) cancelAnimationFrame(hintFrame); hintFrame = null; }
@@ -1791,7 +1958,7 @@ figure.ph.cl{position:absolute}
     });
   }
 
-  /* ---------- 60·61 사진 틀 너비를 1989 사진 비율에 맞춘다 (사진이 없으면 900px 그대로) ---------- */
+  /* ---------- 61·62 사진 틀 너비를 1989 사진 비율에 맞춘다 (사진이 없으면 900px 그대로) ---------- */
   function setupAspectFrames() {
     each(deck.querySelectorAll('img[data-aspect-source]'), function (img) {
       var slide = img.closest('.slide');
@@ -1818,7 +1985,18 @@ figure.ph.cl{position:absolute}
   var TRANSITION = ['enter-next', 'enter-prev', 'leave-next', 'leave-prev', 'enter-sweep', 'leave-sweep'];
   function clearTransition(s) { TRANSITION.forEach(function (c) { s.classList.remove(c); }); }
 
-  function go(i) {
+  /* 단계 공개: 이 장에서 아직 안 보인 단계 수 */
+  var stepShown = 0;
+  function stepsOf(s) { return s.querySelectorAll('.reveal'); }
+  function setSteps(s, n) {
+    each(stepsOf(s), function (el, k) { el.classList.toggle('shown', k < n); });
+    stepShown = n;
+  }
+  function updateStepFlag() {
+    stage.classList.toggle('has-step', cur >= 0 && stepShown < stepsOf(slides[cur]).length);
+  }
+
+  function go(i, revealAll) {
     if (isNaN(i)) return;
     i = Math.max(0, Math.min(total - 1, i));
     if (i === cur) return;
@@ -1859,6 +2037,7 @@ figure.ph.cl{position:absolute}
       }, 1050);
     }
     cur = i;
+    setSteps(to, revealAll ? stepsOf(to).length : 0);
     if (motionOn) { void to.offsetWidth; to.classList.add('play'); countUp(to, playGen); }
     onEnter(to, prev);
     updateChrome();
@@ -1878,7 +2057,7 @@ figure.ph.cl{position:absolute}
 
   function onEnter(slide, prevIndex) {
     each(slide.querySelectorAll('.compare'), function (c) { setPos(c, 50); if (motionOn) hint(c); });
-    // 67번 원: 66번에서 넘어올 때만 커진다. 표시는 다음에 67번에 들어올 때까지 남겨 둔다
+    // 68번 원: 67번에서 넘어올 때만 커진다. 표시는 다음에 68번에 들어올 때까지 남겨 둔다
     each(slide.querySelectorAll('.circle[data-grow-from]'), function (circle) {
       circle.classList.remove('grow');
       var prevN = prevIndex >= 0 ? slides[prevIndex].getAttribute('data-n') : null;
@@ -1890,9 +2069,12 @@ figure.ph.cl{position:absolute}
   }
 
   function step(dir) {
+    var st = stepsOf(slides[cur]);
+    if (dir > 0 && stepShown < st.length) { st[stepShown].classList.add('shown'); stepShown++; updateStepFlag(); return; }
+    if (dir < 0 && stepShown > 0) { stepShown--; st[stepShown].classList.remove('shown'); updateStepFlag(); return; }
     var j = cur + dir;
     while (skipMode && j >= 0 && j < total && isOptional(j)) j += dir;
-    if (j >= 0 && j < total) go(j);
+    if (j >= 0 && j < total) go(j, dir < 0);
   }
 
   function updateChrome() {
@@ -1905,6 +2087,7 @@ figure.ph.cl{position:absolute}
     stage.classList.toggle('on-dark', colored && part !== 's2');
     stage.classList.toggle('on-light-color', colored && part === 's2');
     pageno.textContent = (cur + 1) + ' / ' + total + (isOptional(cur) ? ' · 선택' : '');
+    updateStepFlag();
     renderNotes();
   }
 
@@ -1914,6 +2097,8 @@ figure.ph.cl{position:absolute}
     notesHead.textContent = s.getAttribute('data-n') + ' · ' + (s.getAttribute('data-title') || '') + (isOptional(cur) ? ' (선택)' : '');
     if (aside && aside.textContent.trim()) notesBody.innerHTML = aside.innerHTML;
     else notesBody.innerHTML = '<span class="none">메모 없음</span>';
+    if (editing && aside) notesBody.setAttribute('contenteditable', 'true');
+    else notesBody.removeAttribute('contenteditable');
   }
 
   /* ---------- 주소의 #번호 ---------- */
@@ -1980,6 +2165,8 @@ figure.ph.cl{position:absolute}
       frame.className = 'ov-frame';
       var clone = s.cloneNode(true);
       clone.classList.remove('active', 'leaving', 'play');
+      clone.classList.add('show-all');
+      each(clone.querySelectorAll('[contenteditable]'), function (el) { el.removeAttribute('contenteditable'); });
       TRANSITION.forEach(function (c) { clone.classList.remove(c); });
       clone.removeAttribute('id');
       each(clone.querySelectorAll('[id]'), function (el) { el.removeAttribute('id'); });
@@ -2017,6 +2204,8 @@ figure.ph.cl{position:absolute}
 
   /* ---------- 키보드 ---------- */
   document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.code === 'KeyS') { if (editing) { e.preventDefault(); save(); } return; }
+    if (editing && e.target && e.target.isContentEditable) { if (e.key === 'Escape') e.target.blur(); return; }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     var key = e.key, code = e.code || '';
 
@@ -2031,6 +2220,7 @@ figure.ph.cl{position:absolute}
     if (code === 'KeyF') { toggleFullscreen(); }
     else if (code === 'KeyS') { setSkip(!skipMode); }
     else if (code === 'KeyM') { setMotion(!motionOn, true); }
+    else if (code === 'KeyE') { setEditing(!editing); }
     else if (code === 'KeyN') { toggleNotes(); }
     else if (code === 'KeyO') { openOverview(); }
     else {
@@ -2049,7 +2239,7 @@ figure.ph.cl{position:absolute}
           break;
         case 'Home': go(0); break;
         case 'End': go(total - 1); break;
-        case 'Escape': if (notesOpen) toggleNotes(); break;
+        case 'Escape': if (editing) setEditing(false); else if (notesOpen) toggleNotes(); break;
         default: return;
       }
     }
@@ -2058,8 +2248,8 @@ figure.ph.cl{position:absolute}
 
   /* ---------- 마우스 클릭: 왼쪽 1/3 이전, 오른쪽 2/3 다음 ---------- */
   document.addEventListener('click', function (e) {
-    if (overviewOpen || e.button !== 0) return;
-    if (e.target.closest && e.target.closest('[data-interactive], #notes-panel, #overview')) return;
+    if (overviewOpen || editing || e.button !== 0) return;
+    if (e.target.closest && e.target.closest('[data-interactive], #notes-panel, #overview, #edit-bar, #edit-btn, #toast')) return;
     if (Date.now() - lastSwipe < 600) return;
     step(e.clientX < window.innerWidth / 3 ? -1 : 1);
   });
@@ -2073,7 +2263,7 @@ figure.ph.cl{position:absolute}
     touchSkip = !!(e.target.closest && e.target.closest('[data-interactive], #notes-panel, #overview'));
   }, { passive: true });
   document.addEventListener('touchend', function (e) {
-    if (touchX === null || touchSkip || overviewOpen) { touchX = null; return; }
+    if (touchX === null || touchSkip || overviewOpen || editing) { touchX = null; return; }
     var t = e.changedTouches[0];
     var dx = t.clientX - touchX, dy = t.clientY - touchY;
     touchX = null;
@@ -2083,16 +2273,179 @@ figure.ph.cl{position:absolute}
     }
   }, { passive: true });
 
+  /* ---------- 편집 모드 (E) ----------
+     고친 글은 원본 복사본(pristine)의 같은 자리에 넣어 HTML 파일로 저장한다.
+     정리표·패턴은 템플릿 한 곳, 09번 연설문은 08번 한 곳이 원본이다. */
+  var editing = false, motionBeforeEdit = true, fileHandle = null;
+  var origs = [], groups = [], dirty = {}, dirtyNotes = {};
+  var editBar = document.getElementById('edit-bar');
+  var editCount = document.getElementById('edit-count');
+  var editBtn = document.getElementById('edit-btn');
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+
+  function linkEdit(live, orig) {
+    if (!live || !orig) return;
+    var k = origs.indexOf(orig);
+    if (k < 0) { k = origs.length; origs.push(orig); groups.push([]); }
+    groups[k].push(live);
+    live.__ei = k;
+  }
+  function setupEditMap() {
+    if (editLive.length === editOrig.length) editLive.forEach(function (el, k) { linkEdit(el, editOrig[k]); });
+    var speech = document.getElementById('speech');
+    if (speech && speech.__ei !== undefined) {
+      each(deck.querySelectorAll('[data-same-as="speech"]'), function (b) { linkEdit(b, origs[speech.__ei]); });
+    }
+    var sumTpl = pristine.querySelector('#summary-data');
+    if (sumTpl) {
+      var cells = sumTpl.content.querySelectorAll('th, td');
+      each(deck.querySelectorAll('table.sum'), function (t) { each(t.querySelectorAll('th, td'), function (c, k) { linkEdit(c, cells[k]); }); });
+    }
+    var ptTpl = pristine.querySelector('#pattern-data');
+    if (ptTpl) {
+      var texts = ptTpl.content.querySelectorAll('.pt-name, .pt-ex');
+      each(deck.querySelectorAll('.slide .pt'), function (pt) { each(pt.querySelectorAll('.pt-name, .pt-ex'), function (el, k) { linkEdit(el, texts[k]); }); });
+    }
+  }
+  function dirtyCount() { return Object.keys(dirty).length + Object.keys(dirtyNotes).length; }
+  function updateEditBar() { editCount.textContent = dirtyCount() ? '고친 곳 ' + dirtyCount() + '개' : '고친 곳 없음'; }
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('on'); }, 2600);
+  }
+  function setEditing(on) {
+    if (on === editing) return;
+    editing = on;
+    document.body.classList.toggle('editing', on);
+    stage.classList.toggle('editing', on);
+    if (on) {
+      motionBeforeEdit = motionOn;
+      setMotion(false, false);
+      if (overviewOpen) closeOverview();
+      each(deck.querySelectorAll('.bs'), function (p) { if (p.querySelector('.w')) p.textContent = p.textContent; });
+      groups.forEach(function (g) { g.forEach(function (el) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }); });
+      toast('편집 모드: 글자를 눌러 고치고 Ctrl+S로 저장한다');
+    } else {
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+      groups.forEach(function (g) { g.forEach(function (el) { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }); });
+      splitWords();
+      markCounts();
+      fitAll();
+      overviewGrid.innerHTML = '';
+      overviewBuilt = false;
+      setMotion(motionBeforeEdit, false);
+      if (dirtyCount()) toast('저장하지 않은 고친 곳이 ' + dirtyCount() + '개 있다. E → 저장(Ctrl+S)');
+    }
+    renderNotes();
+    updateEditBar();
+  }
+  deck.addEventListener('input', function (e) {
+    if (!editing) return;
+    var el = e.target.closest ? e.target.closest('[contenteditable="true"]') : null;
+    if (!el || el.__ei === undefined) return;
+    dirty[el.__ei] = true;
+    groups[el.__ei].forEach(function (o) { if (o !== el) o.innerHTML = el.innerHTML; });
+    updateEditBar();
+  });
+  deck.addEventListener('keydown', function (e) {
+    if (!editing || !e.target.isContentEditable) return;
+    if (e.key === 'Enter') { e.preventDefault(); document.execCommand('insertLineBreak'); }
+  });
+  document.addEventListener('paste', function (e) {
+    if (!editing || !e.target.isContentEditable) return;
+    e.preventDefault();
+    var text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
+  notesBody.addEventListener('input', function () {
+    if (!editing) return;
+    var aside = slides[cur].querySelector('aside.notes');
+    if (!aside) return;
+    aside.innerHTML = notesBody.innerHTML;
+    dirtyNotes[cur] = true;
+    updateEditBar();
+  });
+  function cleanHTML(el) {
+    var c = el.cloneNode(true);
+    each(c.querySelectorAll('.w'), function (w) { w.parentNode.replaceChild(document.createTextNode(w.textContent), w); });
+    each(c.querySelectorAll('[contenteditable], [spellcheck]'), function (x) { x.removeAttribute('contenteditable'); x.removeAttribute('spellcheck'); });
+    return c.innerHTML;
+  }
+  function savedHtml() {
+    Object.keys(dirty).forEach(function (k) { origs[k].innerHTML = cleanHTML(groups[k][0]); });
+    var origSlides = pristine.querySelectorAll('#deck > section.slide');
+    Object.keys(dirtyNotes).forEach(function (k) {
+      var a = slides[k].querySelector('aside.notes'), o = origSlides[k] && origSlides[k].querySelector('aside.notes');
+      if (a && o) o.innerHTML = cleanHTML(a);
+    });
+    return '<!doctype html>\n' + pristine.outerHTML;
+  }
+  function fileName() {
+    var n = decodeURIComponent(location.pathname.split('/').pop() || '');
+    return /\.html?$/i.test(n) ? n : 'index.html';
+  }
+  function save() {
+    var html = savedHtml();
+    function done(msg) { dirty = {}; dirtyNotes = {}; updateEditBar(); toast(msg); }
+    function download() {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+      a.download = fileName();
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      done('다운로드 폴더에 ' + fileName() + ' 으로 저장했다');
+    }
+    if (window.showSaveFilePicker) {
+      var pick = fileHandle ? Promise.resolve(fileHandle) : window.showSaveFilePicker({ suggestedName: fileName(), types: [{ description: 'HTML 파일', accept: { 'text/html': ['.html'] } }] });
+      pick.then(function (h) {
+        fileHandle = h;
+        return h.createWritable().then(function (w) { return w.write(html).then(function () { return w.close(); }); }).then(function () { done(h.name + ' 에 저장했다'); });
+      }).catch(function (err) {
+        if (err && err.name === 'AbortError') return;
+        download();
+      });
+    } else {
+      download();
+    }
+  }
+  editBar.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    var act = b.getAttribute('data-act');
+    if (act === 'prev') step(-1);
+    else if (act === 'next') step(1);
+    else if (act === 'notes') toggleNotes();
+    else if (act === 'save') save();
+    else if (act === 'close') setEditing(false);
+  });
+  editBtn.addEventListener('click', function () { setEditing(true); });
+  var btnTimer = null, lastX = -1, lastY = -1;
+  document.addEventListener('mousemove', function (e) {
+    // 장이 바뀔 때 브라우저가 보내는 가짜 움직임은 무시하고, 마우스가 실제로 움직였을 때만 버튼을 보인다
+    if (Math.abs(e.clientX - lastX) + Math.abs(e.clientY - lastY) < 3) return;
+    lastX = e.clientX; lastY = e.clientY;
+    document.body.classList.add('show-edit-btn');
+    clearTimeout(btnTimer);
+    btnTimer = setTimeout(function () { document.body.classList.remove('show-edit-btn'); }, 2500);
+  });
+  window.addEventListener('beforeunload', function (e) {
+    if (dirtyCount()) { e.preventDefault(); e.returnValue = ''; }
+  });
+
   /* ---------- 시작 ---------- */
   buildSpeech();
   buildSummary();
   buildPattern();
   prepareMotion();
+  setupEditMap();
   setupImages();
   addBoardIcons();
   setupCompare();
   setupAspectFrames();
-  function fitAll() { fitSummary(); fitColumns(); }
   fitAll();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
   window.addEventListener('load', fitAll);
