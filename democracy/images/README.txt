@@ -3,48 +3,83 @@
 
 이 폴더(images)에 아래 파일명 그대로 사진을 넣으면 슬라이드에 바로 보인다.
 파일명은 영문 소문자와 확장자(.jpg / .png)까지 정확히 같아야 한다.
-넣지 않은 사진 자리에는 점선 상자(파일명 · 설명 · 교과서 쪽수)가 보인다.
+넣지 않은 사진 자리에는 점선 상자(파일명 · 설명 · 구할 곳)가 보인다.
 
-파일명                        내용                                                   쓰는 장        구할 곳
-----------------------------  -----------------------------------------------------  -------------  -------------------------------------------
-king-march.jpg                연설하는 마틴 루서 킹과 군중                           02, 11, 72     교과서 228쪽
-apartheid-museum.jpg          아파르트헤이트 박물관 입구 (백인 / 비백인 표지판)      14             교과서 228쪽
-mandela-nobel.jpg             노벨 평화상을 받은 넬슨 만델라                         17             교과서 228쪽
-boston-1967.jpg               보스턴 마라톤에서 저지당하는 여성 주자                 22             교과서 229쪽
-uk-women-1971.jpg             행진하는 영국 여성들 (1971)                            02, 26, 27     교과서 229쪽
-saudi-2018.jpg                운전면허증을 받고 기뻐하는 여성                        30             교과서 229쪽
-eight-hours-cartoon.jpg       1일 8시간 노동을 옹호하는 노동 신문의 만화             02, 36         교과서 230쪽
-ilo-poster.jpg                세계 산재 사망 노동자 추모의 날 포스터                 46             교과서 230쪽
-philadelphia-1944.jpg         필라델피아 총회에 참석한 각국 사람들  (없어도 됨)      43             교과서 231쪽
-vietnam-map.png               베트남 위치 지도  (없어도 됨)                          49             교사가 준비
-vietnam-protest.jpg           베트남 전쟁 반대 시위 (미국)                           02, 50         교과서 232쪽
-nuclear-test-protest.jpg      핵 실험 반대 시위                                      53             교과서 232쪽
-iraq-protest-2003.jpg         이라크 전쟁 반대 운동 (이탈리아)                       55             교과서 232쪽
-ukraine-protest-2022.jpg      러시아의 우크라이나 침공 반대 시위 (오스트레일리아)    56             교과서 232쪽
-aral-map.png                  아랄해 위치 지도                                       59             교과서 233쪽 지구본 그림 또는 교사가 준비
-aral-1989.jpg                 아랄해 위성 사진 (1989)                                60, 61         교과서 233쪽 또는 NASA Earth Observatory
-aral-2008.jpg                 아랄해 위성 사진 (2008)                                02, 61, 72     교과서 233쪽 또는 NASA Earth Observatory
-yellow-dust.jpg               한반도 쪽으로 이동하는 황사 위성 사진                  63             NASA Earth Observatory 또는 기상청
-greenpeace.jpg                그린피스 선박                                          68             교과서 233쪽
 
-● "없어도 됨" 두 장(43번 philadelphia-1944.jpg, 49번 vietnam-map.png)은
-  파일이 없으면 점선 상자 대신 사진 자리 자체가 사라지고 글자만 보인다.
+1. 교과서 사진 (교과서 228~233쪽)
+----------------------------------
 
+파일명                        내용                                                   쓰는 장                 구할 곳
+----------------------------  -----------------------------------------------------  ----------------------  ------------------------------------------
+king-march.jpg                연설하는 마틴 루서 킹과 군중                           01, 02, 03, 04, 11,     교과서 228쪽
+                                                                                     32, 48, 72
+apartheid-museum.jpg          아파르트헤이트 박물관 입구 (백인 / 비백인 표지판)      14, 73~76               교과서 228쪽
+mandela-nobel.jpg             노벨 평화상을 받은 넬슨 만델라                         17                      교과서 228쪽
+boston-1967.jpg               보스턴 마라톤에서 저지당하는 여성 주자                 22, 23                  교과서 229쪽
+uk-women-1971.jpg             행진하는 영국 여성들 (1971)                            02, 26, 27, 72, 73~76   교과서 229쪽
+saudi-2018.jpg                운전면허증을 받고 기뻐하는 여성                        30                      교과서 229쪽
+eight-hours-cartoon.jpg       1일 8시간 노동을 옹호하는 노동 신문의 만화             01~04, 32, 36, 48, 72   교과서 230쪽
+ilo-poster.jpg                세계 산재 사망 노동자 추모의 날 포스터                 46                      교과서 230쪽
+weimar-constitution.jpg       바이마르 헌법 표지                                     39                      교과서 231쪽 탐구
+wagner-act-1935.jpg           와그너법에 서명하는 루스벨트                           40                      교과서 231쪽 탐구
+philadelphia-1944.jpg         필라델피아 총회에 참석한 각국 사람들  (없어도 됨)      43, 73~76               교과서 231쪽
+vietnam-protest.jpg           베트남 전쟁 반대 시위 (미국)                           01~04, 32, 48, 50, 72   교과서 232쪽
+nuclear-test-protest.jpg      핵 실험 반대 시위                                      53                      교과서 232쪽
+iraq-protest-2003.jpg         이라크 전쟁 반대 운동 (이탈리아)                       55                      교과서 232쪽
+ukraine-protest-2022.jpg      러시아의 우크라이나 침공 반대 시위 (오스트레일리아)    56                      교과서 232쪽
+aral-map.png                  아랄해 위치 지도                                       59                      교과서 233쪽 지구본 그림 또는 교사가 준비
+aral-1989.jpg                 아랄해 위성 사진 (1989)                                60, 61                  교과서 233쪽 또는 NASA Earth Observatory
+aral-2008.jpg                 아랄해 위성 사진 (2008)                                02, 61, 72, 73~76       교과서 233쪽 또는 NASA Earth Observatory
+greenpeace.jpg                그린피스 선박                                          68                      교과서 233쪽
+
+
+2. 추가로 구해 넣을 사진 (교과서에 없음)
+---------------------------------------
+
+모두 역사 사진이라 위키미디어 공용(commons.wikimedia.org)에서 저작권이 풀린(퍼블릭 도메인)
+사진을 많이 찾을 수 있다. 오른쪽 검색어를 그대로 넣어 보면 된다.
+
+파일명                        내용                                          쓰는 장   찾을 때 검색어 (영어)
+----------------------------  --------------------------------------------  --------  ------------------------------------------------
+segregation-sign.jpg          인종에 따라 나눈 표지판 (1950년대 미국 남부)  07        segregation sign colored waiting room
+civil-rights-act-1964.jpg     민권법에 서명하는 존슨 대통령 (1964)          12        Lyndon Johnson signing Civil Rights Act 1964
+selma-1965.jpg                투표권을 요구하는 셀마–몽고메리 행진 (1965)   13        Selma to Montgomery march 1965
+apartheid-sign.jpg            '백인 전용' 표지판 (남아프리카 공화국)        15        apartheid sign whites only
+robben-island.jpg             넬슨 만델라가 갇혔던 로벤섬 감방              16        Robben Island Mandela cell
+sa-election-1994.jpg          투표하려고 줄 선 사람들 (남아공, 1994)        18        South Africa 1994 election queue
+suffragettes.jpg              참정권을 요구하는 여성들 (20세기 초 영국)     21        suffragettes London march
+haymarket-1886.jpg            1886년 시카고 노동자 집회를 그린 판화         35        Haymarket affair 1886 engraving
+child-labor.jpg               산업 혁명기 공장에서 일하는 아이들            37        child labor factory 19th century
+mayday-1890s.jpg              초기 메이데이 집회 (1890년대)                 38        May Day 1890 demonstration
+ilo-1919.jpg                  국제 노동 기구 첫 총회 (1919, 워싱턴)         41        International Labour Conference 1919 Washington
+us-withdrawal-1973.jpg        베트남에서 철수하는 미군 (1973)               52        last US troops leave Vietnam 1973
+npt-1968.jpg                  핵 확산 금지 조약 서명 (1968)                 54        Nuclear Non-Proliferation Treaty signing 1968
+aral-ships.jpg                말라붙은 아랄해 바닥에 남은 배                62        Aral Sea ship graveyard Moynaq
+yellow-dust.jpg               한반도 쪽으로 이동하는 황사 위성 사진         63        NASA dust storm Korea / 기상청 황사 위성 영상
+rio-1992.jpg                  리우 환경 개발 회의 (1992)                    65        Earth Summit Rio 1992
+vietnam-map.png               베트남 위치 지도  (없어도 됨)                 49        교사가 준비
+
+● 사진은 가로로 긴 사진(가로:세로 = 4:3 안팎)이 잘 맞는다. 세로로 긴 사진은 위아래가 잘린다.
+● "없어도 됨" 사진(43번 philadelphia-1944.jpg, 49번 vietnam-map.png)은 파일이 없으면
+  점선 상자 대신 사진 자리 자체가 사라지고 글자만 크게 보인다.
 ● 아랄해 두 장(aral-1989.jpg, aral-2008.jpg)은 61번 비교 화면에서 겹쳐 보인다.
-  구도와 크기가 같은 한 쌍을 같은 출처에서 구하는 것이 좋다.
+  구도와 크기가 같은 한 쌍을 같은 출처에서 구하는 것이 좋다. 60·61번 사진 틀은
+  1989 사진의 가로세로 비율에 맞춰 너비가 바뀐다.
 
-● 사진이 잘리는 위치 바꾸기
-  사진은 틀을 꽉 채우도록 잘린다. 잘리는 위치를 바꾸려면 index.html에서 그 사진의
-  <img ...> 줄을 찾아 data-focus="가로% 세로%" 를 넣거나 고친다.
-    예) data-focus="50% 30%"   → 가운데에서 조금 위쪽을 중심으로
-        data-focus="0% 50%"    → 왼쪽 끝을 중심으로
-  사진 전체가 잘리지 않고 다 보이게 하려면 data-fit="contain" 을 넣는다
-  (36번 만화, 46번 포스터, 49·59번 지도는 이미 이렇게 되어 있다).
 
-● 27번 피켓 확대
-  27번은 uk-women-1971.jpg의 일부를 크게 보여 준다. 사진을 넣은 뒤 index.html의 27번에서
-    data-zoom="2.2"        → 확대 배율 (클수록 크게)
-    data-focus="78% 25%"   → 확대할 곳 (가로% 세로%)
-  두 값을 바꿔 가며 피켓(EQUAL PAY NOW 등)이 보이게 맞춘다.
+3. 사진 잘리는 위치 바꾸기
+-------------------------
+
+사진은 틀을 꽉 채우도록 잘린다. 잘리는 위치를 바꾸려면 index.html에서 그 사진의
+<img ...> 줄을 찾아 data-focus="가로% 세로%" 를 넣거나 고친다.
+  예) data-focus="50% 30%"   → 가운데에서 조금 위쪽을 중심으로
+      data-focus="0% 50%"    → 왼쪽 끝을 중심으로
+사진 전체가 잘리지 않고 다 보이게 하려면 data-fit="contain" 을 넣는다
+(36번 만화, 39번 바이마르 헌법, 46번 포스터, 49·59번 지도는 이미 이렇게 되어 있다).
+
+27번 피켓 확대: 27번은 uk-women-1971.jpg의 일부를 크게 보여 준다. index.html의 27번에서
+  data-zoom="2.2"        → 확대 배율 (클수록 크게)
+  data-focus="78% 25%"   → 확대할 곳 (가로% 세로%)
+두 값을 바꿔 가며 피켓(EQUAL PAY NOW 등)이 보이게 맞춘다.
 
 ※ 교과서 사진은 저작권이 있으므로 이 폴더의 사진은 공개 저장소에 올리지 않는다(.gitignore).

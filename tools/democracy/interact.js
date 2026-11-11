@@ -91,6 +91,7 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
   const box = await page.locator('.slide.active .compare').boundingBox();
   const pos = () => page.evaluate(() => document.querySelector('.slide.active .compare').style.getPropertyValue('--pos'));
   ok((await pos()) === '50%', '61 시작 위치 50%');
+  await page.waitForTimeout(1000); // 나타나는 움직임이 끝난 뒤 끈다
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width * 0.2, box.y + box.height / 2, { steps: 5 });
@@ -119,20 +120,33 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
   await goto(66); await press('ArrowRight');
   const grow = await page.evaluate(() => { const c = document.querySelector('.slide.active .circle'); return { cls: c.classList.contains('grow'), anim: c.getAnimations().map((a) => a.animationName) }; });
   ok(grow.cls && grow.anim.includes('circleGrow'), '66→67: 원이 커지는 애니메이션');
-  await page.waitForTimeout(400);
-  ok(await page.evaluate(() => document.querySelector('.slide.active .circle').getBoundingClientRect().width) > 300, '애니메이션 뒤 큰 원');
+  await page.waitForTimeout(1200);
+  ok(await page.evaluate(() => document.querySelector('.slide.active .circle').getBoundingClientRect().width) > 600 * 1280 / 1920, '애니메이션 뒤 큰 원');
   await goto(65); await goto(67);
   ok(await page.evaluate(() => !document.querySelector('.slide.active .circle').classList.contains('grow')), '65→67(번호 이동): 처음부터 큰 원, 애니메이션 없음');
 
-  // 내용 애니메이션은 67번 원 하나뿐
-  const extraAnims = [];
+  // 움직임: 장에 들어오면 요소 애니메이션이 돈다
+  const noAnim = [];
   for (let n = 1; n <= 77; n++) {
     await goto(n);
-    const a = await page.evaluate(() => document.getAnimations().filter((x) => !(x.effect.target.classList.contains('slide') && x.animationName === 'fadeIn')).map((x) => x.animationName));
-    const allowed = n === 67 ? a.filter((x) => x !== 'circleGrow') : a;
-    if (allowed.length) extraAnims.push(n + ':' + allowed.join(','));
+    const c = await page.evaluate(() => { const s = document.querySelector('#deck > .slide.active'); return s.classList.contains('play') ? document.getAnimations().filter((a) => a.effect.target && s.contains(a.effect.target)).length : -1; });
+    if (c <= 0) noAnim.push(n);
   }
-  ok(extraAnims.length === 0, '장 전환 페이드 말고 다른 애니메이션 없음' + (extraAnims.length ? ' → ' + extraAnims.join(' ') : ''));
+  ok(noAnim.length === 0, '움직임: 77장 모두 들어올 때 애니메이션이 돈다' + (noAnim.length ? ' → 없음: ' + noAnim.join(',') : ''));
+  await goto(30); await page.waitForTimeout(200); await press('ArrowRight');
+  const wipe = await page.evaluate(() => [...document.querySelectorAll('#deck > .slide')].map((s) => s.className).filter((c) => /enter-|leave-/.test(c)).join(' | '));
+  ok(/enter-next/.test(wipe) && /leave-next/.test(wipe), '같은 이야기 안에서는 닦아 내는 장 전환 → ' + wipe);
+  await page.waitForTimeout(1100); await press('ArrowRight');
+  const sw = await page.evaluate(() => ({ go: document.getElementById('sweep').classList.contains('go'), text: document.getElementById('sweep').textContent }));
+  ok(sw.go && sw.text === '노동', '이야기가 바뀌면(31→32) 색 띠가 지나감 → ' + sw.text);
+  await page.waitForTimeout(1100);
+  await press('KeyM');
+  const off = await page.evaluate(() => ({ flag: getComputedStyle(document.getElementById('motionflag')).display, motion: document.getElementById('stage').classList.contains('motion') }));
+  await press('ArrowRight'); await page.waitForTimeout(50);
+  const offAnims = await page.evaluate(() => document.getAnimations().map((a) => (a.animationName || a.transitionProperty) + '@' + (a.effect.target.id || a.effect.target.className)));
+  ok(off.flag !== 'none' && !off.motion && offAnims.length === 0, 'M: 움직임 끄면 애니메이션 없음, "움직임 끔" 표시 → ' + JSON.stringify({ flag: off.flag, motion: off.motion, offAnims }));
+  await press('KeyM');
+  ok(await page.evaluate(() => document.getElementById('stage').classList.contains('motion')), 'M 다시: 움직임 켜짐');
 
   // 장마다 구성
   const facts = await page.evaluate(() => {
@@ -197,8 +211,8 @@ function ok(cond, msg) { console.log((cond ? 'ok   ' : 'FAIL ') + msg); if (!con
   const p2 = await ctx2.newPage();
   await p2.goto(url + '#66');
   await p2.keyboard.press('ArrowRight'); await p2.waitForTimeout(50);
-  const rm = await p2.evaluate(() => ({ grow: document.querySelector('.slide.active .circle').classList.contains('grow'), fade: !!document.querySelector('.slide.fade'), w: document.querySelector('.slide.active .circle').getBoundingClientRect().width }));
-  ok(!rm.grow && !rm.fade && rm.w > 300, 'prefers-reduced-motion: 페이드 없음, 바로 큰 원');
+  const rm = await p2.evaluate(() => ({ grow: document.querySelector('.slide.active .circle').classList.contains('grow'), moving: !!document.querySelector('.slide.play, .slide.leaving') || document.getAnimations().length > 0, w: document.querySelector('.slide.active .circle').getBoundingClientRect().width }));
+  ok(!rm.grow && !rm.moving && rm.w > 600 * 1280 / 1920, 'prefers-reduced-motion: 움직임 없음, 바로 큰 원');
 
   await browser.close();
   console.log(fails ? `\n${fails}개 실패` : '\n모두 통과');

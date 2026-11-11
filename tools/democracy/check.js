@@ -15,7 +15,7 @@ const [vw, vh] = (process.argv[4] || '1920x1080').split('x').map(Number);
 
 (async () => {
   const browser = await chromium.launch();
-  const ctx = await browser.newContext({ viewport: { width: vw, height: vh }, offline: true }); // 인터넷 없이
+  const ctx = await browser.newContext({ viewport: { width: vw, height: vh }, offline: true, reducedMotion: 'reduce' }); // 인터넷 없이, 움직임 없이 최종 화면
   const page = await ctx.newPage();
   const errors = [];
   page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errors.push(`[console.${m.type()}] ${m.text()}`); });

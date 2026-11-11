@@ -18,6 +18,7 @@
     "정리표 데이터", "패턴 데이터" 주석을 찾아 고친다.
   ● 조작: → Space PageDown Enter 다음 / ← PageUp Backspace 이전 / Home End 처음·끝
           숫자+Enter 그 장으로 / F 전체 화면 / S 선택 장 건너뛰기 / N 메모 / O 전체 목록
+          M 움직임 끄기·켜기
 -->
 <style>
 /* ---------- 글꼴 (fonts 폴더) ---------- */
@@ -41,6 +42,9 @@
   --cal-blue:#2B57C9;
   --display:"Black Han Sans","IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
   --text:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+  --io:cubic-bezier(.7,0,.2,1);
+  --out:cubic-bezier(.16,1,.3,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
 }
 
 /* ---------- 무대 ---------- */
@@ -54,27 +58,25 @@ h1,h2,h3,p,ul,figure,table{margin:0}
 .slide{position:absolute;inset:0;padding-top:56px;background:var(--paper);visibility:hidden;overflow:hidden}
 .slide.active{visibility:visible;z-index:2}
 .slide.leaving{visibility:visible;z-index:1}
-.slide.fade{animation:fadeIn 120ms linear both}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@media (prefers-reduced-motion:reduce){.slide.fade{animation:none}}
 .notes{display:none}
 
 /* 이야기별 색: --c 바탕색, --on-c 그 위 글자색 */
-.slide[data-part="intro"],.slide[data-part="outro"]{--c:var(--ink);--on-c:#fff}
-.slide[data-part="s1"]{--c:var(--story-1);--on-c:#fff}
-.slide[data-part="s2"]{--c:var(--story-2);--on-c:var(--ink)}
-.slide[data-part="s3"]{--c:var(--story-3);--on-c:#fff}
+.slide[data-part="intro"],.slide[data-part="outro"]{--c:var(--ink);--on-c:#fff;--crowd:rgba(255,255,255,.08)}
+.slide[data-part="s1"]{--c:var(--story-1);--on-c:#fff;--crowd:rgba(0,0,0,.16)}
+.slide[data-part="s2"]{--c:var(--story-2);--on-c:var(--ink);--crowd:rgba(0,0,0,.11)}
+.slide[data-part="s3"]{--c:var(--story-3);--on-c:#fff;--crowd:rgba(0,0,0,.16)}
 
 /* ---------- 글자 ---------- */
-.title{font-family:var(--display);font-weight:700;font-size:72px;line-height:1.2;text-wrap:balance}
-.big{font-family:var(--display);font-weight:700;font-size:200px;line-height:1;color:var(--c);letter-spacing:-.01em}
-.headline{font-family:var(--display);font-weight:700;font-size:72px;line-height:1.25;text-wrap:balance}
-.desc,.body{font-size:48px;font-weight:600;line-height:1.5;text-wrap:pretty}
-.caption{font-size:34px;font-weight:400;line-height:1.45;color:var(--muted);text-wrap:pretty}
+.title{font-family:var(--display);font-weight:700;font-size:84px;line-height:1.18;text-wrap:balance}
+.big{font-family:var(--display);font-weight:700;font-size:240px;line-height:.95;color:var(--c);letter-spacing:-.01em}
+.headline{font-family:var(--display);font-weight:700;font-size:88px;line-height:1.2;text-wrap:balance}
+.desc,.body{font-size:54px;font-weight:600;line-height:1.45;text-wrap:pretty}
+.caption{font-size:38px;font-weight:400;line-height:1.45;color:var(--muted);text-wrap:pretty}
 
 /* ---------- 진행 표시 · 장 번호 · 판서 신호 ---------- */
 #progress{position:absolute;left:0;top:0;width:1920px;height:56px;display:grid;grid-template-columns:repeat(5,1fr);z-index:10;background:var(--paper);border-bottom:1px solid #D8DBD3}
 #progress div{display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:#A6ABB2;letter-spacing:.04em}
+#stage.motion #progress div{transition:background-color .5s,color .5s}
 #progress div+div{border-left:1px solid #DFE2DA}
 #progress div.on{color:#fff;background:var(--pc)}
 #progress [data-p="intro"],#progress [data-p="outro"]{--pc:var(--ink)}
@@ -87,8 +89,9 @@ h1,h2,h3,p,ul,figure,table{margin:0}
 #footer{position:absolute;right:28px;bottom:16px;z-index:11;display:flex;gap:16px;align-items:center;font-size:22px;font-weight:600;line-height:1.3;color:var(--muted);pointer-events:none}
 #stage.on-dark #footer{color:rgba(255,255,255,.78)}
 #stage.on-light-color #footer{color:rgba(29,34,40,.7)}
-#skipflag{display:none;border:2px solid currentColor;padding:0 10px}
+#skipflag,#motionflag{display:none;border:2px solid currentColor;padding:0 10px}
 #stage.skip #skipflag{display:inline-block}
+#stage.still #motionflag{display:inline-block}
 #digits{background:var(--ink);color:#fff;padding:0 12px}
 #digits:empty{display:none}
 
@@ -96,6 +99,12 @@ h1,h2,h3,p,ul,figure,table{margin:0}
 .board-icon svg{display:block;width:28px;height:28px}
 .slide[data-layout="placard"] .board-icon{color:rgba(255,255,255,.78)}
 .slide[data-layout="placard"][data-part="s2"] .board-icon{color:rgba(29,34,40,.7)}
+
+/* 이야기가 바뀔 때 화면을 가로지르는 색 띠 */
+#sweep{position:absolute;left:-12%;right:-12%;top:0;bottom:0;z-index:9;display:none;align-items:center;justify-content:center;background:var(--sw);color:var(--sw-on);transform:skewX(-12deg);pointer-events:none}
+#sweep span{font-family:var(--display);font-weight:700;font-size:300px;line-height:1;transform:skewX(12deg)}
+#sweep.go{display:flex;animation:sweepRun 1s var(--io) both}
+@keyframes sweepRun{0%{translate:-110% 0}42%,56%{translate:0 0}100%{translate:110% 0}}
 
 /* ---------- 교사 메모 (N) ---------- */
 #notes-panel{position:absolute;left:0;right:0;bottom:0;z-index:20;display:none;max-height:460px;overflow:auto;background:rgba(22,26,31,.96);color:#F2F3EF;padding:24px 64px 36px;user-select:text;-webkit-user-select:text;touch-action:pan-y}
@@ -131,154 +140,220 @@ figure.ph.gone{display:none}
 .ph-page{font-size:24px;font-weight:400}
 
 /* ---------- 피켓 ---------- */
-.placard{position:relative;background:#fff;border:10px solid var(--ink);transform:rotate(-1.5deg);padding:64px 104px;max-width:1640px;
-  font-family:var(--display);font-weight:700;font-size:92px;line-height:1.25;color:var(--ink);text-align:center;text-wrap:balance;--stick:var(--ink)}
-.placard::after{content:"";position:absolute;left:50%;top:100%;width:36px;margin-left:-18px;height:1400px;background:var(--stick)}
-.placard.small{border-width:8px;padding:40px 46px;font-size:64px;max-width:640px}
-.placard.small::after{width:24px;margin-left:-12px}
-.placard .sub{display:block;margin-top:22px;font-family:var(--text);font-weight:600;font-size:36px;line-height:1.4}
+.placard{position:relative;z-index:1;background:#fff;border:10px solid var(--ink);transform:rotate(-1.5deg);padding:64px 96px;max-width:1720px;
+  font-family:var(--display);font-weight:700;font-size:116px;line-height:1.22;color:var(--ink);text-align:center;text-wrap:balance;--stick:var(--ink);transform-origin:50% 100%}
+.placard::after{content:"";position:absolute;left:50%;top:100%;width:40px;margin-left:-20px;height:1400px;background:var(--stick)}
+.placard.small{border-width:8px;padding:40px 46px;font-size:72px;max-width:660px}
+.placard.small::after{width:26px;margin-left:-13px}
+.placard .sub{display:block;margin-top:22px;font-family:var(--text);font-weight:600;font-size:38px;line-height:1.4}
+/* 피켓 장 뒤쪽의 군중 피켓 그림자 (스크립트가 넣는다) */
+.crowd{position:absolute;inset:0;pointer-events:none}
+.crowd i{position:absolute;display:block;background:var(--crowd);transform:rotate(var(--r));transform-origin:50% 100%}
+.crowd i::after{content:"";position:absolute;left:50%;top:100%;width:22px;margin-left:-11px;height:900px;background:var(--crowd)}
 
 /* ===================== 레이아웃 ===================== */
 
+/* 글 + 사진 두 단 (사실·용어·짧은 줄·아이콘 장 공통) */
+.slide.with-side{display:flex;align-items:center;gap:80px;padding:96px 100px 60px 140px}
+.main-col{flex:1;min-width:0}
+.side-col{flex:none;width:860px;display:flex;flex-direction:column;gap:16px}
+.side-col figure.ph{width:100%;height:640px}
+.side-col:has(> figure.gone){display:none}
+/* 글꼴이 넓어(폴백 글꼴 등) 왼쪽 글이 무대보다 길어지면 스크립트가 tight 를 붙인다 */
+.main-col.tight .big{font-size:190px}
+.main-col.tight .title{font-size:70px}
+.main-col.tight .headline{font-size:70px}
+.main-col.tight .term{font-size:80px}
+.main-col.tight .desc,.main-col.tight .def,.main-col.tight .points li{font-size:46px}
+.main-col.tight .chips span{font-size:34px}
+.main-col.tight .facts-list li{font-size:36px}
+.main-col.tight .chips-label,.main-col.tight .facts-list{margin-top:24px}
+/* 사진이 없어 오른쪽 단이 사라지면 글자를 키운다 (49번) */
+.slide.with-side:has(> .side-col > figure.gone) .big{font-size:320px}
+.slide.with-side:has(> .side-col > figure.gone) .headline{font-size:120px}
+.slide.with-side:has(> .side-col > figure.gone) .desc{font-size:68px}
+
 /* title · 표지 */
-.slide[data-layout="title"]{padding:0 140px 120px;display:flex;flex-direction:column;justify-content:flex-end}
+.slide[data-layout="title"]{padding:0}
+.cover-text{position:absolute;left:140px;bottom:120px;width:860px}
 .cover-bars{display:flex;gap:16px;margin-bottom:56px}
-.cover-bars i{display:block;width:120px;height:16px}
+.cover-bars i{display:block;width:120px;height:16px;transform-origin:0 50%}
 .cover-sub{font-size:44px;font-weight:600;color:var(--muted);margin-bottom:28px}
-.cover-title{font-family:var(--display);font-weight:700;font-size:184px;line-height:1.08;letter-spacing:-.01em}
+.cover-title{font-family:var(--display);font-weight:700;font-size:184px;line-height:1.08;letter-spacing:-.01em;white-space:nowrap}
 .cover-pages{margin-top:48px}
+.cover-strips{position:absolute;right:100px;top:80px;bottom:80px;display:flex;gap:28px}
+.cover-strips figure.ph{flex:none;width:220px;height:100%}
+.cover-strips figure.s1{background:var(--story-1)}
+.cover-strips figure.s2{background:var(--story-2)}
+.cover-strips figure.s3{background:var(--story-3)}
+.cover-strips figure img{filter:grayscale(1) contrast(1.15);mix-blend-mode:multiply}
+.cover-strips figure.missing{background:#E6E8E2}
 
 /* placard · 피켓 질문 */
-.slide[data-layout="placard"]{background:var(--c);display:flex;align-items:center;justify-content:center;padding:56px 120px 190px}
+.slide[data-layout="placard"]{background:var(--c);display:flex;align-items:center;justify-content:center;padding:56px 100px 170px}
 .slide[data-layout="placard"][data-part="intro"] .placard,.slide[data-layout="placard"][data-part="outro"] .placard{--stick:#8B929B}
 
 /* roadmap · 로드맵과 구분 화면 */
-.rm-title{position:absolute;left:120px;top:120px}
+.rm-title{position:absolute;left:120px;top:104px}
 .rm-target{position:absolute;right:120px;top:84px;font-size:28px;font-weight:600;color:var(--muted)}
-.rm-cards{position:absolute;left:120px;right:120px;top:288px;bottom:112px;display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
-.rm-card{display:flex;flex-direction:column;border:6px solid var(--ink);background:#fff;padding:44px 44px 40px}
+.rm-cards{position:absolute;left:120px;right:120px;top:236px;bottom:56px;display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
+.rm-card{position:relative;display:flex;flex-direction:column;border:6px solid var(--ink);background:#fff}
 .rm-card.s1{--cc:var(--story-1);--on-cc:#fff}
 .rm-card.s2{--cc:var(--story-2);--on-cc:var(--ink)}
 .rm-card.s3{--cc:var(--story-3);--on-cc:#fff}
-.rm-num{width:96px;height:96px;border-radius:50%;background:var(--cc);color:var(--on-cc);font-family:var(--display);font-weight:700;font-size:60px;line-height:96px;text-align:center;margin-bottom:40px}
-.rm-q{font-family:var(--display);font-weight:700;font-size:60px;line-height:1.25;text-wrap:balance}
-.rm-mv{margin-top:auto;padding-top:28px;font-size:36px;font-weight:600;line-height:1.35;color:var(--muted)}
+.rm-card figure.ph{flex:none;height:300px;border-bottom:6px solid var(--ink)}
+.rm-body{position:relative;flex:1;display:flex;flex-direction:column;padding:72px 40px 36px}
+.rm-num{position:absolute;left:36px;top:-56px;width:104px;height:104px;border-radius:50%;border:6px solid var(--ink);background:var(--cc);color:var(--on-cc);font-family:var(--display);font-weight:700;font-size:60px;line-height:92px;text-align:center}
+.rm-q{font-family:var(--display);font-weight:700;font-size:62px;line-height:1.22;text-wrap:balance}
+.rm-mv{margin-top:auto;padding-top:24px;font-size:36px;font-weight:600;line-height:1.35;color:var(--muted)}
 .rm-card.on{background:var(--cc);color:var(--on-cc)}
 .rm-card.on .rm-num{background:var(--on-cc);color:var(--cc)}
 .rm-card.on .rm-mv{color:inherit}
 .rm-card.off{opacity:.3}
 
 /* fact · 사실 */
-.slide[data-layout="fact"]{display:flex;flex-direction:column;justify-content:center;padding:56px 160px 40px}
-.fact-row{display:flex;align-items:center;gap:96px}
-.fact-text{flex:1;min-width:0}
+.slide[data-layout="fact"]:not(.with-side){display:flex;flex-direction:column;justify-content:center;padding:56px 160px 40px}
 .slide[data-layout="fact"] .title{margin-bottom:36px}
-.slide[data-layout="fact"] .big{margin-bottom:20px}
-.slide[data-layout="fact"] .desc{margin-top:20px;max-width:1500px}
-.fact-figure{flex:none;width:720px;height:540px}
-.fact-figure.map{width:560px;height:640px}
-.diagram{flex:none;position:relative;width:640px;height:640px}
-.circle{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:260px;height:260px;border-radius:50%;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--display);font-weight:700;font-size:52px;line-height:1.2;white-space:nowrap}
-.circle.big-circle{width:560px;height:560px;font-size:64px}
-.circle.grow{animation:circleGrow 300ms ease-out}
-@keyframes circleGrow{from{width:260px;height:260px}to{width:560px;height:560px}}
-@media (prefers-reduced-motion:reduce){.circle.grow{animation:none}}
+.slide[data-layout="fact"] .big{margin-bottom:24px}
+.slide[data-layout="fact"] .desc{margin-top:22px}
+.diagram{position:relative;width:860px;height:760px}
+.circle{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:300px;height:300px;border-radius:50%;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--display);font-weight:700;font-size:60px;line-height:1.2;white-space:nowrap}
+.circle.big-circle{width:660px;height:660px;font-size:76px}
+#stage.motion .circle.grow{animation:circleGrow 300ms ease-out both}
+@keyframes circleGrow{from{width:300px;height:300px}to{width:660px;height:660px}}
+.facts-list{list-style:none;padding:0;margin:36px 0 0}
+.facts-list li{position:relative;padding-left:44px;font-size:40px;font-weight:600;line-height:1.4;color:#3A4049}
+.facts-list li+li{margin-top:14px}
+.facts-list li::before{content:"";position:absolute;left:0;top:.62em;width:22px;height:22px;margin-top:-11px;border-radius:50%;background:var(--c)}
+.chips-label{margin-top:44px}
+.chips{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px}
+.chips span{border:4px solid var(--c);padding:6px 22px;font-size:40px;font-weight:700;line-height:1.3;background:#fff}
+/* 34번 일력 */
+.tearcal{position:relative;align-self:center;width:640px;height:760px;background:#fff;border:6px solid var(--ink);display:flex;flex-direction:column;align-items:center;text-align:center}
+.tearcal::before{content:"";position:absolute;left:24px;right:24px;top:-26px;height:40px;background:radial-gradient(circle,var(--ink) 11px,transparent 12px) 0 50%/80px 40px repeat-x}
+.tc-top{align-self:stretch;background:var(--cal-red);color:#fff;font-family:var(--display);font-weight:700;font-size:64px;line-height:1;padding:40px 0 30px}
+.tc-day{font-family:var(--display);font-weight:700;font-size:400px;line-height:1;color:var(--cal-red);margin-top:30px}
+.tc-week{font-size:52px;font-weight:700;color:var(--muted)}
+.tc-label{margin-top:22px;font-family:var(--display);font-weight:700;font-size:78px;line-height:1;background:var(--story-2);padding:14px 40px}
+/* 24번 두 해 비교 */
+.steps2{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.st2{border:6px solid var(--ink);background:#fff;padding:34px 44px}
+.st2.on{background:var(--c);color:var(--on-c)}
+.st2-y{display:block;font-family:var(--display);font-weight:700;font-size:120px;line-height:1;color:var(--c)}
+.st2.on .st2-y{color:var(--on-c)}
+.st2-t{display:block;margin-top:14px;font-size:50px;font-weight:700;line-height:1.3}
+.st2-arrow{align-self:center;width:12px;height:90px;background:var(--ink);position:relative;margin-bottom:34px}
+.st2-arrow::after{content:"";position:absolute;left:50%;bottom:-34px;margin-left:-30px;border-top:36px solid var(--ink);border-left:30px solid transparent;border-right:30px solid transparent}
 
 /* term · 용어 */
-.slide[data-layout="term"]{display:flex;flex-direction:column;justify-content:center;padding:56px 160px 40px}
-.term-block{border-left:16px solid var(--c);padding:6px 0 6px 56px}
-.term{font-family:var(--display);font-weight:700;font-size:72px;line-height:1.2}
-.def{font-size:48px;font-weight:600;line-height:1.5;margin-top:28px;max-width:1450px;text-wrap:pretty}
-.term-block .caption{margin-top:32px;max-width:1450px}
-.term-block.small{border-left-width:12px;padding:4px 0 4px 36px;margin-top:72px}
-.term-block.small .term{display:inline;font-size:48px;margin-right:24px}
-.term-block.small .def{display:inline;font-size:40px;margin-top:0}
-.term-flow{display:flex;align-items:center;gap:56px}
-.term-flow .from{border-left:16px solid var(--c);padding:6px 0 6px 48px;font-family:var(--display);font-weight:700;font-size:80px;line-height:1.25}
-.term-flow .to{font-family:var(--display);font-weight:700;font-size:80px;line-height:1.25;color:var(--c)}
-.term-flow .arrow{flex:none;width:200px;height:64px;color:var(--ink)}
+.slide[data-layout="term"]:not(.with-side){display:flex;flex-direction:column;justify-content:center;padding:56px 140px 40px}
+.term-block{border-left:18px solid var(--c);padding:6px 0 6px 56px}
+.term{font-family:var(--display);font-weight:700;font-size:100px;line-height:1.15;text-wrap:balance}
+.def{font-size:54px;font-weight:600;line-height:1.45;margin-top:30px;text-wrap:pretty}
+.term-block .caption{margin-top:30px}
+.term-block.small{border-left-width:14px;padding:6px 0 6px 36px;margin-top:64px}
+.term-block.small .term{display:inline;font-size:56px;margin-right:24px}
+.term-block.small .def{display:inline;font-size:44px;margin-top:0}
+.term-flow{display:flex;align-items:center;gap:60px}
+.term-flow .from{border-left:18px solid var(--c);padding:6px 0 6px 52px;font-family:var(--display);font-weight:700;font-size:112px;line-height:1.2}
+.term-flow .to{font-family:var(--display);font-weight:700;font-size:112px;line-height:1.2;color:var(--c)}
+.term-flow .arrow{flex:none;width:260px;height:84px;color:var(--ink)}
+.term-more{margin-top:90px}
+.term-more .chips span{font-size:46px}
 
 /* timeline · 연표 */
-.slide[data-layout="timeline"]{display:flex;flex-direction:column;justify-content:center;padding:56px 160px 40px}
-.tl{display:grid;grid-template-columns:560px 1fr 560px;grid-template-rows:auto 52px auto}
-.tl-year{grid-row:1;align-self:end;text-align:center;font-family:var(--display);font-weight:700;font-size:150px;line-height:1;color:var(--c);margin-bottom:32px}
-.tl-dot{grid-row:2;justify-self:center;width:52px;height:52px;border-radius:50%;background:var(--c)}
-.tl-text{grid-row:3;text-align:center;font-size:48px;font-weight:600;line-height:1.4;margin-top:32px;text-wrap:balance}
+.slide[data-layout="timeline"]{display:flex;flex-direction:column;justify-content:center;padding:56px 120px 40px}
+.tl{display:grid;grid-template-columns:640px 1fr 640px;grid-template-rows:auto 72px auto}
+.tl-year{grid-row:1;align-self:end;text-align:center;font-family:var(--display);font-weight:700;font-size:210px;line-height:1;color:var(--c);margin-bottom:36px}
+.tl-dot{grid-row:2;justify-self:center;width:72px;height:72px;border-radius:50%;background:var(--c);border:8px solid var(--ink)}
+.tl-text{grid-row:3;text-align:center;font-size:58px;font-weight:600;line-height:1.35;margin-top:36px;text-wrap:balance}
 .tl .c1{grid-column:1}
 .tl .c3{grid-column:3}
-.tl-arrow{grid-column:1/4;grid-row:2;align-self:center;position:relative;height:10px;margin:0 330px;background:var(--ink)}
-.tl-arrow::after{content:"";position:absolute;right:-2px;top:50%;transform:translateY(-50%);border-left:44px solid var(--ink);border-top:24px solid transparent;border-bottom:24px solid transparent}
-.tl-gap{grid-column:1/4;grid-row:1;justify-self:center;align-self:end;font-family:var(--display);font-weight:700;font-size:96px;line-height:1;margin-bottom:40px}
-.tl.strong .tl-arrow{height:32px;margin:0 340px 0 316px}
-.tl.strong .tl-arrow::after{right:-36px;border-left-width:84px;border-top-width:54px;border-bottom-width:54px}
-.tl-note{margin-top:96px}
+.tl-arrow{grid-column:1/4;grid-row:2;align-self:center;position:relative;height:14px;margin:0 400px 0 376px;background:var(--ink);transform-origin:0 50%}
+.tl-arrow::after{content:"";position:absolute;right:-50px;top:50%;transform:translateY(-50%);border-left:56px solid var(--ink);border-top:30px solid transparent;border-bottom:30px solid transparent}
+.tl-gap{grid-column:1/4;grid-row:1;justify-self:center;align-self:end;font-family:var(--display);font-weight:700;font-size:130px;line-height:1;margin-bottom:44px}
+.tl.strong .tl-arrow{height:38px;margin:0 430px 0 376px}
+.tl.strong .tl-arrow::after{right:-80px;border-left-width:90px;border-top-width:60px;border-bottom-width:60px}
+.tl-note{margin-top:90px;font-size:60px}
 
 /* big-number · 큰 숫자 */
-.slide[data-layout="big-number"]{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:56px 120px 40px}
-.bn{display:flex;align-items:center;gap:44px}
-.bn-side{font-family:var(--display);font-weight:700;font-size:80px;line-height:1;color:var(--muted)}
-.bn-line{width:170px;height:6px;background:var(--muted)}
-.bn-main{font-family:var(--display);font-weight:700;font-size:220px;line-height:1;color:var(--c)}
-.bn-note{margin-top:80px}
+.slide[data-layout="big-number"]{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:56px 80px 40px}
+.bn{display:flex;align-items:center;gap:36px}
+.bn-side{font-family:var(--display);font-weight:700;font-size:110px;line-height:1;color:var(--muted)}
+.bn-line{width:100px;height:10px;background:var(--muted)}
+.bn-main{font-family:var(--display);font-weight:700;font-size:320px;line-height:1;color:var(--c)}
+.bn-note{margin-top:90px;font-size:64px}
 
 /* big-sentence · 큰 문장 */
-.slide[data-layout="big-sentence"]{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:56px 160px 40px}
-.bs{font-family:var(--display);font-weight:700;font-size:92px;line-height:1.3;max-width:1600px;text-wrap:balance}
-.bs+.bs{margin-top:44px}
+.slide[data-layout="big-sentence"]{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:56px 120px 40px}
+.bs{font-family:var(--display);font-weight:700;font-size:112px;line-height:1.28;max-width:1680px;text-wrap:balance}
+.bs+.bs{margin-top:52px}
 .bs.accent{color:var(--c)}
-.bs-note{margin-top:56px}
+.bs.huge{font-size:156px}
+.bs-note{margin-top:64px;font-size:46px}
+.bs .w{display:inline-block}
 
 /* points · 짧은 줄 */
-.slide[data-layout="points"]{display:flex;flex-direction:column;justify-content:center;padding:56px 160px 40px}
+.slide[data-layout="points"]:not(.with-side){display:flex;flex-direction:column;justify-content:center;padding:56px 160px 40px}
 .points{list-style:none;padding:0;margin:56px 0 0}
-.points li{position:relative;padding-left:68px;font-size:48px;font-weight:600;line-height:1.5;max-width:1500px;text-wrap:pretty}
-.points li+li{margin-top:44px}
-.points li::before{content:"";position:absolute;left:0;top:.75em;width:36px;height:8px;margin-top:-4px;background:var(--c)}
-.points+.caption{margin-top:72px;max-width:1500px}
+.points li{position:relative;padding-left:72px;font-size:56px;font-weight:600;line-height:1.42;text-wrap:pretty}
+.points li+li{margin-top:40px}
+.points li::before{content:"";position:absolute;left:0;top:.71em;width:40px;height:10px;margin-top:-5px;background:var(--c);transform-origin:0 50%}
+.points+.caption{margin-top:60px}
+/* 39번 문서 카드 */
+.doc{display:flex;gap:40px;align-items:center;border:6px solid var(--ink);background:#fff;padding:40px}
+.doc figure.ph{flex:none;width:300px;height:440px}
+.doc-y{font-family:var(--display);font-weight:700;font-size:58px;line-height:1.15;color:var(--c)}
+.doc-q{margin-top:22px;font-size:40px;font-weight:600;line-height:1.5}
 
 /* icons · 아이콘과 말 */
-.slide[data-layout="icons"]{display:flex;flex-direction:column;justify-content:center;padding:56px 160px 40px}
-.icons{display:flex;gap:72px;margin-top:72px}
-.icons figure{width:340px;display:flex;flex-direction:column;align-items:center;text-align:center}
-.icons svg{width:160px;height:160px;fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
-.icons figcaption{margin-top:28px;font-size:48px;font-weight:600;line-height:1.35;text-wrap:balance}
-.icons.four{gap:60px}
-.icons.four figure{width:355px}
-.icons.four figcaption{font-size:44px}
-.icons+.body{margin-top:72px}
+.slide[data-layout="icons"]:not(.with-side){display:flex;flex-direction:column;justify-content:center;padding:56px 120px 40px}
+.icons{display:flex;gap:28px;margin-top:56px}
+.icons figure{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;background:#fff;border:5px solid var(--ink);padding:40px 16px 34px}
+.icons svg{width:170px;height:170px;fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.icons figcaption{margin-top:24px;font-size:52px;font-weight:700;line-height:1.3;text-wrap:balance}
+.icons.four{gap:36px;margin-top:48px}
+.icons.four svg{width:210px;height:210px}
+.icons.four figure{padding:52px 20px 44px;border-top:16px solid var(--c)}
+.icons.four figcaption{font-size:54px}
+.icons+.body{margin-top:56px}
+.slide:not(.with-side) .icons:not(.four) svg{width:240px;height:240px}
+.slide:not(.with-side) .icons:not(.four) figure{padding:56px 20px 48px}
+.slide:not(.with-side) .icons:not(.four) figcaption{font-size:64px}
+.icons-sub{margin-top:18px;font-size:44px}
 
 /* source · 사료 */
-.slide[data-layout="source"]{display:flex;flex-direction:column;justify-content:center;padding:56px 160px 40px}
-.instruction{font-family:var(--display);font-weight:700;font-size:64px;line-height:1.2}
-.source-label{margin-top:40px}
-.source-box{margin-top:14px;background:#fff;border:2px solid #D6D9D2;padding:44px 60px;font-size:44px;font-weight:600;line-height:1.7}
+.slide[data-layout="source"]{display:flex;flex-direction:column;justify-content:center;padding:56px 140px 40px}
+.instruction{font-family:var(--display);font-weight:700;font-size:76px;line-height:1.2}
+.source-label{margin-top:30px}
+.source-box{margin-top:12px;background:#fff;border:2px solid #D6D9D2;border-left:16px solid var(--c);padding:44px 60px;font-size:48px;font-weight:600;line-height:1.62}
 .source-box mark{background:none;color:inherit}
 .source-box.marked mark{background:var(--mark);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 .06em}
 .source-box .empty-msg{color:var(--muted)}
 
 /* photo · 사진 */
-.slide[data-layout="photo"]{--photo-w:1340px;display:grid;grid-template-columns:var(--photo-w) 1fr;grid-template-rows:minmax(0,1fr) auto;column-gap:56px;row-gap:28px;padding:104px 80px 64px}
+.slide[data-layout="photo"]{--photo-w:1340px;display:grid;grid-template-columns:var(--photo-w) 1fr;grid-template-rows:minmax(0,1fr) auto;column-gap:56px;row-gap:28px;padding:96px 80px 60px}
 .photo-main{grid-column:1;grid-row:1}
 .photo-side{grid-column:2;grid-row:1;display:flex;flex-direction:column;justify-content:flex-end;min-width:0}
 .photo-side .title{margin-bottom:28px}
-.photo-side .big{font-size:180px;margin-bottom:28px}
+.photo-side .big{font-size:190px;margin-bottom:28px}
 .photo-line{grid-column:1/3;grid-row:2}
 /* 60·61 사진 틀: 1989 사진의 가로세로 비율을 따른다(최대 900px). 스크립트가 --frame-w, --frame-shift를 정한다 */
 .slide.aral-frame{--photo-w:var(--frame-w,900px);column-gap:80px;padding:168px 80px 52px calc(120px + var(--frame-shift,0px))}
 
 /* photo-question · 사진과 질문, photo-zoom · 사진 확대 */
-.slide[data-layout="photo-question"],.slide[data-layout="photo-zoom"]{display:grid;grid-template-columns:1060px 1fr;grid-template-rows:minmax(0,1fr) auto;column-gap:72px;row-gap:20px;padding:104px 80px 56px}
+.slide[data-layout="photo-question"],.slide[data-layout="photo-zoom"]{display:grid;grid-template-columns:1080px 1fr;grid-template-rows:minmax(0,1fr) auto;column-gap:64px;row-gap:20px;padding:96px 80px 56px}
 .pq-photo{grid-column:1;grid-row:1}
 .pq-caption{grid-column:1;grid-row:2}
-.pq-side{grid-column:2;grid-row:1/3;display:flex;justify-content:center;align-items:flex-start;padding-top:120px}
+.pq-side{grid-column:2;grid-row:1/3;display:flex;justify-content:center;align-items:flex-start;padding-top:110px}
 
 /* calendar · 달력 */
-.slide[data-layout="calendar"]{display:grid;grid-template-columns:1200px 1fr;column-gap:64px;padding:68px 80px 20px}
+.slide[data-layout="calendar"]{display:grid;grid-template-columns:1200px 1fr;column-gap:56px;padding:68px 80px 20px}
 .cal-title{font-family:var(--display);font-weight:700;font-size:72px;line-height:1.1;margin-bottom:8px}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);border-top:4px solid var(--ink)}
 .cal .dow{text-align:center;padding:4px 0;font-size:32px;font-weight:600;color:var(--muted);border-bottom:2px solid var(--ink)}
 .cal .d{height:136px;border-bottom:2px solid #D3D6CF;display:flex;flex-direction:column;align-items:center;padding-top:12px;font-size:48px;font-weight:600;line-height:1}
-.cal .d .num{display:flex;align-items:center;justify-content:center;width:84px;height:84px}
+.cal .d .num{position:relative;display:flex;align-items:center;justify-content:center;width:84px;height:84px}
 .cal .sun,.cal .hol{color:var(--cal-red)}
 .cal .sat{color:var(--cal-blue)}
 .cal .d.ring{padding-top:3px}
@@ -305,7 +380,7 @@ figure.ph.cl{position:absolute}
 .cl-c{left:1380px;top:96px;width:460px;height:420px}
 .cl-d{left:880px;top:436px;width:460px;height:584px}
 .cl-e{left:1380px;top:556px;width:460px;height:464px}
-.cl-q{position:absolute;left:80px;width:760px;top:640px;display:flex;justify-content:center}
+.cl-q{position:absolute;left:80px;width:760px;top:636px;display:flex;justify-content:center}
 
 /* summary · 정리표 */
 .slide[data-layout="summary"]{padding:96px 120px 36px}
@@ -329,15 +404,189 @@ figure.ph.cl{position:absolute}
 /* pattern · 패턴 */
 .slide[data-layout="pattern"]{display:flex;align-items:center;padding:56px 0 0 80px}
 .pt{display:flex;align-items:stretch}
-.pt-step{flex:none;width:350px;min-height:500px;display:flex;flex-direction:column;border:6px solid var(--ink);background:#fff;padding:40px 30px}
+.pt-step{flex:none;width:352px;min-height:760px;display:flex;flex-direction:column;border:6px solid var(--ink);background:#fff}
 .pt-step.open{border-style:dashed}
-.pt-name{font-family:var(--display);font-weight:700;font-size:60px;line-height:1.2;text-wrap:balance}
-.pt-ex{margin-top:28px;font-size:36px;line-height:1.5;color:var(--muted)}
-.pt-arrow,.pt-tail{flex:none;position:relative;align-self:center;height:10px;background:var(--ink)}
-.pt-arrow{width:62px;margin:0 34px 0 0}
-.pt-arrow::after,.pt-tail::after{content:"";position:absolute;right:-30px;top:50%;transform:translateY(-50%);border-left:34px solid var(--ink);border-top:22px solid transparent;border-bottom:22px solid transparent}
-.pt-tail{width:136px}
+.pt-step figure.ph{flex:none;height:300px}
+.pt-name{padding:34px 28px 0;font-family:var(--display);font-weight:700;font-size:62px;line-height:1.18;text-wrap:balance}
+.pt-ex{padding:24px 28px 30px;font-size:38px;line-height:1.5;color:var(--muted)}
+.pt-arrow,.pt-tail{flex:none;position:relative;align-self:center;height:12px;background:var(--ink);transform-origin:0 50%}
+.pt-arrow{width:58px;margin:0 38px 0 0}
+.pt-arrow::after,.pt-tail::after{content:"";position:absolute;right:-34px;top:50%;transform:translateY(-50%);border-left:38px solid var(--ink);border-top:24px solid transparent;border-bottom:24px solid transparent}
+.pt-tail{width:136px;background:repeating-linear-gradient(90deg,var(--ink) 0 26px,transparent 26px 40px)}
 .pt .later{visibility:hidden}
+
+/* ===================== 움직임 =====================
+   무대(#stage)에 motion 이 붙어 있을 때만 움직인다. M 키로 끄고 켠다.
+   장에 들어오면 그 장에 play 가 붙고, 요소마다 아래 애니메이션이 한 번 돈다.
+   지연 시간 = 장 전환 시간(--base) + 요소 순서(--d) */
+@keyframes mRise{from{opacity:0;translate:0 80px}to{opacity:1;translate:0 0}}
+@keyframes mRiseBig{from{opacity:0;translate:0 180px;scale:.85}to{opacity:1;translate:0 0;scale:1}}
+@keyframes mLeft{from{opacity:0;translate:-160px 0}to{opacity:1;translate:0 0}}
+@keyframes mRight{from{opacity:0;translate:200px 0}to{opacity:1;translate:0 0}}
+@keyframes mPop{0%{opacity:0;scale:.2}60%{opacity:1;scale:1.12}100%{opacity:1;scale:1}}
+@keyframes mBlur{from{opacity:0;filter:blur(24px);scale:1.25}to{opacity:1;filter:blur(0);scale:1}}
+@keyframes mMask{from{clip-path:inset(0 0 100% 0);translate:0 60px}to{clip-path:inset(-20% -10% -20% -10%);translate:0 0}}
+@keyframes mWipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes mWipeUp{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes mDrawX{from{scale:0 1}to{scale:1 1}}
+@keyframes mDrawY{from{scale:1 0}to{scale:1 1}}
+@keyframes mKen{from{scale:1.16}to{scale:1}}
+@keyframes mStroke{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes mFade{from{opacity:0}to{opacity:1}}
+@keyframes mDim{from{opacity:1}to{opacity:.3}}
+@keyframes mRaise{0%{opacity:0;translate:0 120%;rotate:-14deg}55%{opacity:1;translate:0 -5%;rotate:3deg}78%{translate:0 1.5%;rotate:-1.5deg}100%{opacity:1;translate:0 0;rotate:0deg}}
+@keyframes mSway{from{rotate:0deg;translate:0 0}to{rotate:1.6deg;translate:0 -10px}}
+@keyframes mCrowd{from{translate:0 140%}to{translate:0 0}}
+@keyframes mBob{from{translate:0 0;rotate:0deg}to{translate:0 -18px;rotate:2deg}}
+@keyframes mFlip{from{opacity:0;rotate:x 85deg}to{opacity:1;rotate:x 0deg}}
+@keyframes mSpin{0%{opacity:0;scale:.2;rotate:-200deg}70%{opacity:1;scale:1.15}100%{opacity:1;scale:1;rotate:0deg}}
+@keyframes mPulse{from{opacity:.7;scale:1}to{opacity:0;scale:1.9}}
+@keyframes mHighlight{from{background-size:0% 100%}to{background-size:100% 100%}}
+@keyframes mFlow{from{background-position:0 0}to{background-position:40px 0}}
+@keyframes mGlow{0%{box-shadow:0 0 0 0 rgba(255,228,92,.9)}100%{box-shadow:0 0 0 28px rgba(255,228,92,0)}}
+@keyframes mFlyA{from{opacity:0;translate:-700px -100px;rotate:-18deg}to{opacity:1;translate:0 0;rotate:0deg}}
+@keyframes mFlyB{from{opacity:0;translate:0 -600px;rotate:12deg}to{opacity:1;translate:0 0;rotate:0deg}}
+@keyframes mFlyC{from{opacity:0;translate:700px -200px;rotate:16deg}to{opacity:1;translate:0 0;rotate:0deg}}
+@keyframes mFlyD{from{opacity:0;translate:-200px 700px;rotate:-10deg}to{opacity:1;translate:0 0;rotate:0deg}}
+@keyframes mFlyE{from{opacity:0;translate:600px 600px;rotate:20deg}to{opacity:1;translate:0 0;rotate:0deg}}
+/* 장 전환 */
+@keyframes enterNext{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0 0 0 0)}}
+@keyframes enterPrev{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes leaveNext{to{translate:-14% 0;scale:.92;filter:brightness(.55)}}
+@keyframes leavePrev{to{translate:14% 0;scale:.92;filter:brightness(.55)}}
+@keyframes holdIn{0%,44%{opacity:0}45%,100%{opacity:1}}
+@keyframes holdOut{0%,44%{opacity:1}45%,100%{opacity:0}}
+
+#stage.motion .slide.enter-next{animation:enterNext .7s var(--io) both}
+#stage.motion .slide.enter-prev{animation:enterPrev .7s var(--io) both}
+#stage.motion .slide.leave-next{animation:leaveNext .7s var(--io) both}
+#stage.motion .slide.leave-prev{animation:leavePrev .7s var(--io) both}
+#stage.motion .slide.enter-sweep{animation:holdIn 1s linear both}
+#stage.motion .slide.leave-sweep{animation:holdOut 1s linear both}
+
+#stage.motion .slide.play *,#stage.motion .slide.play *::before,#stage.motion .slide.play *::after{animation-delay:calc(var(--base,.3s) + var(--d,0s)) !important}
+.motion .play .title,.motion .play .headline,.motion .play .instruction,.motion .play .term,.motion .play .cal-title{animation-name:mMask;animation-duration:.9s;animation-timing-function:var(--out);animation-fill-mode:both}
+.motion .play .desc,.motion .play .body,.motion .play .caption,.motion .play .def{animation:mRise .8s var(--out) both;--d:.35s}
+.motion .play .big{animation:mRiseBig 1s var(--out) both}
+.motion .play .big+.headline{--d:.25s}
+.motion .play .title+.big{--d:.2s}
+/* 사진: 닦아 내듯 나타나고 천천히 줌 */
+.motion .play figure.ph{animation:mWipe 1s var(--io) both;--d:.1s}
+.motion .play figure.ph img{animation:mKen 9s cubic-bezier(.2,.6,.3,1) both}
+.motion .play .compare figure.ph,.motion .play .compare figure.ph img{animation:none}
+.motion .play .side-col{animation:mRight 1s var(--out) both;--d:.15s}
+.motion .play .side-col figure.ph{animation:none}
+.motion .play .side-col>.caption{--d:.8s}
+/* 피켓: 아래에서 들려 올라와 흔들린다 */
+.motion .play .placard{animation:mRaise 1.15s cubic-bezier(.2,.9,.3,1) both,mSway 2.6s ease-in-out infinite alternate}
+#stage.motion .slide.play .placard{animation-delay:calc(var(--base) + .1s),calc(var(--base) + 1.25s) !important}
+#stage.motion .slide.play .placard.small{animation-delay:calc(var(--base) + .55s),calc(var(--base) + 1.7s) !important}
+.motion .play .crowd i{animation:mCrowd .9s var(--out) both,mBob var(--bob,3s) ease-in-out infinite alternate}
+#stage.motion .slide.play .crowd i{animation-delay:calc(var(--base) + var(--d)),calc(var(--base) + var(--d) + .9s) !important}
+/* 표지 */
+.motion .play .cover-bars i{animation:mDrawX .7s var(--out) both}
+.motion .play .cover-bars i:nth-child(2){--d:.12s}
+.motion .play .cover-bars i:nth-child(3){--d:.24s}
+.motion .play .cover-sub{animation:mFade .8s ease both;--d:.3s}
+.motion .play .cover-title{animation:mMask 1.1s var(--out) both;--d:.45s}
+.motion .play .cover-pages{--d:.9s}
+.motion .play .cover-strips figure.ph{animation:mWipeUp 1.1s var(--io) both}
+.motion .play .cover-strips figure.ph:nth-child(1){--d:.2s}
+.motion .play .cover-strips figure.ph:nth-child(2){--d:.38s}
+.motion .play .cover-strips figure.ph:nth-child(3){--d:.56s}
+/* 로드맵 카드 */
+.motion .play .rm-card{animation:mRiseBig .9s var(--out) both}
+.motion .play .rm-card:nth-child(2){--d:.12s}
+.motion .play .rm-card:nth-child(3){--d:.24s}
+.motion .play .rm-card.off{animation:mRiseBig .9s var(--out) both,mDim .6s ease forwards}
+.motion .play .rm-card.on{animation:mRiseBig .9s var(--out) both,mGlow 1s ease-out 2}
+#stage.motion .slide.play .rm-card.off,#stage.motion .slide.play .rm-card.on{animation-delay:calc(var(--base) + var(--d,0s)),calc(var(--base) + 1.1s) !important}
+.motion .play .rm-card figure.ph{animation:none}
+.motion .play .rm-num{animation:mSpin .9s var(--out) both;--d:.55s}
+.motion .play .rm-card:nth-child(2) .rm-num{--d:.67s}
+.motion .play .rm-card:nth-child(3) .rm-num{--d:.79s}
+/* 연표 */
+.motion .play .tl-year{animation:mPop .8s var(--out) both}
+.motion .play .tl-year.c3{--d:.95s}
+.motion .play .tl-dot{animation:mPop .6s var(--spring) both;--d:.2s}
+.motion .play .tl-dot.c3{--d:1.05s}
+.motion .play .tl-arrow{animation:mDrawX .8s var(--io) both;--d:.4s}
+.motion .play .tl-gap{animation:mSpin .9s var(--out) both;--d:.75s}
+.motion .play .tl-text{animation:mRise .7s var(--out) both;--d:.35s}
+.motion .play .tl-text.c3{--d:1.15s}
+.motion .play .tl-note{--d:1.5s}
+/* 큰 숫자 · 큰 문장 */
+.motion .play .bn-main{animation:mPop 1s var(--out) both;--d:.2s}
+.motion .play .bn-side{animation:mLeft .8s var(--out) both}
+.motion .play .bn-side:last-child{animation-name:mRight}
+.motion .play .bn-line{animation:mDrawX .7s var(--io) both;--d:.3s}
+.motion .play .bn-note{--d:1.2s}
+.motion .play .bs .w{animation:mBlur .7s var(--out) both;--d:calc(var(--i) * 90ms)}
+.motion .play .bs+.bs .w{--d:calc(.6s + var(--i) * 90ms)}
+.motion .play .bs-note{--d:1.4s}
+/* 짧은 줄 */
+.motion .play .points li{animation:mLeft .8s var(--out) both;--d:calc(.3s + var(--i) * .16s)}
+.motion .play .points li::before{animation:mDrawX .6s var(--out) both;--d:calc(.6s + var(--i) * .16s)}
+.motion .play .points+.caption{--d:1s}
+.motion .play .facts-list li{animation:mLeft .7s var(--out) both;--d:calc(.8s + var(--i) * .14s)}
+.motion .play .chips span{animation:mPop .6s var(--spring) both;--d:calc(.9s + var(--i) * .1s)}
+.motion .play .doc{animation:mFlip 1s var(--out) both;--d:.3s}
+.motion .play .doc figure.ph{animation:none}
+/* 아이콘: 선이 그려진다 */
+.motion .play .icons figure{animation:mPop .7s var(--spring) both;--d:calc(.3s + var(--i) * .15s)}
+.motion .play .icons svg *{stroke-dasharray:1;animation:mStroke 1.4s ease-in-out both;--d:calc(.5s + var(--i) * .15s)}
+.motion .play .icons+.body{--d:1.2s}
+/* 용어 */
+.motion .play .term-block{animation:mFade .3s both}
+.motion .play .term-block,.motion .play .term-flow .from{border-left-color:transparent}
+.motion .play .term-block::before,.motion .play .term-flow .from::before{content:"";position:absolute;left:calc(-1 * var(--bar,18px));top:0;bottom:0;width:var(--bar,18px);background:var(--c);transform-origin:50% 0;animation:mDrawY .7s var(--io) both;--d:.1s}
+.term-block.small{--bar:14px}
+.motion .play .term-block,.motion .play .term-flow .from{position:relative}
+.motion .play .term-flow .from{animation:mLeft .9s var(--out) both;--d:.1s}
+.motion .play .term-flow .arrow{animation:mDrawX .7s var(--io) both;transform-origin:0 50%;--d:.7s}
+.motion .play .term-flow .to{animation:mBlur .9s var(--out) both;--d:1.1s}
+/* 사료: 09번 형광펜이 칠해진다 */
+.motion .play .source-box{animation:mRise .9s var(--out) both;--d:.25s}
+.motion .play .source-box.marked mark{background-color:transparent;background-image:linear-gradient(var(--mark),var(--mark));background-repeat:no-repeat;animation:mHighlight .9s ease-in-out both;--d:1s}
+.motion .play .source-box.marked mark:nth-of-type(2){--d:1.9s}
+/* 사진 장 */
+.motion .play .photo-side>*{animation:mRise .8s var(--out) both;--d:.5s}
+.motion .play .photo-side>.big{animation:mRiseBig 1s var(--out) both;--d:.35s}
+.motion .play .photo-line{--d:.8s}
+/* 달력 */
+.motion .play .cal .d,.motion .play .cal .dow{animation:mPop .5s var(--out) both;--d:calc(var(--i) * 22ms)}
+.motion .play .cal .d.ring .num{animation:mSpin 1s var(--out) both;--d:1.2s}
+.motion .play .cal .d.ring .num::after{content:"";position:absolute;inset:-12px;border-radius:50%;border:6px solid var(--cal-red);animation:mPulse 1.4s ease-out infinite;--d:2.2s}
+.motion .play .tearcal{animation:mFlip 1.1s var(--out) both;transform-origin:50% 0;--d:.2s}
+.motion .play .tc-day{animation:mPop .9s var(--spring) both;--d:.9s}
+.motion .play .tc-label{animation:mPop .7s var(--spring) both;--d:1.3s}
+.motion .play .st2{animation:mLeft .8s var(--out) both;--d:.3s}
+.motion .play .st2.on{animation:mPop .9s var(--spring) both;--d:1.1s}
+.motion .play .st2-arrow{animation:mDrawY .5s var(--io) both;transform-origin:50% 0;--d:.8s}
+/* 비교 */
+.motion .play .cmp-labels span{animation:mPop .7s var(--spring) both;--d:.6s}
+.motion .play .cmp-labels span+span{--d:.75s}
+.motion .play .compare{animation:mFade .8s ease both}
+/* 콜라주 */
+.motion .play figure.ph.cl{animation-duration:1s;animation-timing-function:var(--out);animation-fill-mode:both}
+.motion .play .cl-a{animation-name:mFlyA}
+.motion .play .cl-b{animation-name:mFlyB;--d:.12s}
+.motion .play .cl-c{animation-name:mFlyC;--d:.24s}
+.motion .play .cl-d{animation-name:mFlyD;--d:.36s}
+.motion .play .cl-e{animation-name:mFlyE;--d:.48s}
+/* 정리표 */
+.motion .play .sum thead tr{animation:mFade .5s ease both}
+.motion .play .sum tbody tr{animation:mLeft .7s var(--out) both;--d:calc(.3s + var(--i) * .12s)}
+.motion .play .sum tr.hl td{animation:mGlowRow 1.2s ease both;--d:1s}
+@keyframes mGlowRow{0%{background:transparent}40%{background:var(--mark)}100%{background:var(--rt)}}
+/* 패턴: 새 단계만 튀어나온다, 76번 꼬리 화살표는 계속 흐른다 */
+.motion .play .pt .new{animation:mPop .9s var(--spring) both;--d:.2s}
+.motion .play .pt .pt-arrow.new{animation:mDrawX .5s var(--io) both;--d:0s}
+.motion .play .pt .pt-step figure.ph{animation:none}
+.motion .play .pt-tail{animation:mDrawX .6s var(--io) both,mFlow .6s linear infinite}
+#stage.motion .slide.play .pt-tail{animation-delay:calc(var(--base) + .9s),calc(var(--base) + 1.5s) !important}
+/* 원 */
+.motion .play .circle:not(.grow){animation:mPop .9s var(--spring) both;--d:.5s}
 </style>
 </head>
 <body>
@@ -356,10 +605,17 @@ figure.ph.cl{position:absolute}
 
 <!-- 01. 표지 -->
 <section class="slide" data-n="01" data-part="intro" data-layout="title" data-title="표지">
-  <div class="cover-bars" aria-hidden="true"><i style="background:var(--story-1)"></i><i style="background:var(--story-2)"></i><i style="background:var(--story-3)"></i></div>
-  <p class="cover-sub">Ⅶ. 현대 세계의 전개와 과제</p>
-  <h1 class="cover-title">민주주의와<br>인권의 확산</h1>
-  <p class="caption cover-pages">교과서 228~233쪽</p>
+  <div class="cover-text">
+    <div class="cover-bars" aria-hidden="true"><i style="background:var(--story-1)"></i><i style="background:var(--story-2)"></i><i style="background:var(--story-3)"></i></div>
+    <p class="cover-sub">Ⅶ. 현대 세계의 전개와 과제</p>
+    <h1 class="cover-title">민주주의와<br>인권의 확산</h1>
+    <p class="caption cover-pages">교과서 228~233쪽</p>
+  </div>
+  <div class="cover-strips" aria-hidden="true">
+    <figure class="ph s1"><img src="images/king-march.jpg" data-focus="12% 50%" data-desc="연설하는 마틴 루서 킹과 군중" data-page="교과서 228쪽" alt=""></figure>
+    <figure class="ph s2"><img src="images/eight-hours-cartoon.jpg" data-focus="50% 50%" data-desc="1일 8시간 노동을 옹호하는 노동 신문의 만화" data-page="교과서 230쪽" alt=""></figure>
+    <figure class="ph s3"><img src="images/vietnam-protest.jpg" data-focus="40% 50%" data-desc="베트남 전쟁 반대 시위 (미국)" data-page="교과서 232쪽" alt=""></figure>
+  </div>
 </section>
 
 <!-- 02. 사진 콜라주 -->
@@ -377,9 +633,9 @@ figure.ph.cl{position:absolute}
 <section class="slide" data-n="03" data-part="intro" data-layout="roadmap" data-title="오늘의 세 질문">
   <h2 class="title rm-title">오늘의 세 질문</h2>
   <div class="rm-cards">
-    <div class="rm-card s1"><div class="rm-num">1</div><p class="rm-q">사람은 누구나 평등한가?</p><p class="rm-mv">민권 운동 · 여성 운동</p></div>
-    <div class="rm-card s2"><div class="rm-num">2</div><p class="rm-q">일하는 사람에게는 어떤 권리가 필요할까?</p><p class="rm-mv">노동 운동</p></div>
-    <div class="rm-card s3"><div class="rm-num">3</div><p class="rm-q">인류의 생존을 위협하는 문제는 어떻게 해결할까?</p><p class="rm-mv">반전 평화 운동 · 환경 운동</p></div>
+    <div class="rm-card s1"><figure class="ph"><img src="images/king-march.jpg" data-focus="15% 45%" data-desc="연설하는 마틴 루서 킹과 군중" data-page="교과서 228쪽" alt=""></figure><div class="rm-body"><div class="rm-num">1</div><p class="rm-q">사람은 누구나 평등한가?</p><p class="rm-mv">민권 운동 · 여성 운동</p></div></div>
+    <div class="rm-card s2"><figure class="ph"><img src="images/eight-hours-cartoon.jpg" data-focus="50% 10%" data-desc="1일 8시간 노동을 옹호하는 노동 신문의 만화" data-page="교과서 230쪽" alt=""></figure><div class="rm-body"><div class="rm-num">2</div><p class="rm-q">일하는 사람에게는 어떤 권리가 필요할까?</p><p class="rm-mv">노동 운동</p></div></div>
+    <div class="rm-card s3"><figure class="ph"><img src="images/vietnam-protest.jpg" data-focus="50% 25%" data-desc="베트남 전쟁 반대 시위 (미국)" data-page="교과서 232쪽" alt=""></figure><div class="rm-body"><div class="rm-num">3</div><p class="rm-q">인류의 생존을 위협하는 문제는 어떻게 해결할까?</p><p class="rm-mv">반전 평화 운동 · 환경 운동</p></div></div>
   </div>
   <aside class="notes">"오늘은 이 세 질문의 답을 찾아갈 거예요." 칠판의 정리표 틀(운동 / 핵심 용어 / 무엇이 바뀌었나)을 안내한다.</aside>
 </section>
@@ -392,9 +648,9 @@ figure.ph.cl{position:absolute}
 <section class="slide" data-n="04" data-part="s1" data-layout="roadmap" data-title="구분 화면">
   <p class="rm-target teacher">목표 3분</p>
   <div class="rm-cards">
-    <div class="rm-card s1 on"><div class="rm-num">1</div><p class="rm-q">사람은 누구나 평등한가?</p><p class="rm-mv">민권 운동 · 여성 운동</p></div>
-    <div class="rm-card s2 off"><div class="rm-num">2</div><p class="rm-q">일하는 사람에게는 어떤 권리가 필요할까?</p><p class="rm-mv">노동 운동</p></div>
-    <div class="rm-card s3 off"><div class="rm-num">3</div><p class="rm-q">인류의 생존을 위협하는 문제는 어떻게 해결할까?</p><p class="rm-mv">반전 평화 운동 · 환경 운동</p></div>
+    <div class="rm-card s1 on"><figure class="ph"><img src="images/king-march.jpg" data-focus="15% 45%" data-desc="연설하는 마틴 루서 킹과 군중" data-page="교과서 228쪽" alt=""></figure><div class="rm-body"><div class="rm-num">1</div><p class="rm-q">사람은 누구나 평등한가?</p><p class="rm-mv">민권 운동 · 여성 운동</p></div></div>
+    <div class="rm-card s2 off"><figure class="ph"><img src="images/eight-hours-cartoon.jpg" data-focus="50% 10%" data-desc="1일 8시간 노동을 옹호하는 노동 신문의 만화" data-page="교과서 230쪽" alt=""></figure><div class="rm-body"><div class="rm-num">2</div><p class="rm-q">일하는 사람에게는 어떤 권리가 필요할까?</p><p class="rm-mv">노동 운동</p></div></div>
+    <div class="rm-card s3 off"><figure class="ph"><img src="images/vietnam-protest.jpg" data-focus="50% 25%" data-desc="베트남 전쟁 반대 시위 (미국)" data-page="교과서 232쪽" alt=""></figure><div class="rm-body"><div class="rm-num">3</div><p class="rm-q">인류의 생존을 위협하는 문제는 어떻게 해결할까?</p><p class="rm-mv">반전 평화 운동 · 환경 운동</p></div></div>
   </div>
 </section>
 
@@ -422,23 +678,29 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 07. 그러나 -->
-<section class="slide" data-n="07" data-part="s1" data-layout="icons" data-title="그러나">
-  <h2 class="title">그러나 차별은 남았다</h2>
-  <div class="icons">
-    <figure>
-      <svg viewBox="0 0 160 160" aria-hidden="true"><path d="M14 74 80 34l66 40"/><path d="M24 68v72h112V68"/><path d="M66 140v-34h28v34"/><rect x="36" y="86" width="20" height="18"/><rect x="104" y="86" width="20" height="18"/><path d="M80 34V10l20 6-20 6"/><path d="M12 140h136"/></svg>
-      <figcaption>학교</figcaption>
-    </figure>
-    <figure>
-      <svg viewBox="0 0 160 160" aria-hidden="true"><rect x="26" y="22" width="108" height="104" rx="14"/><path d="M38 38h84v38H38z"/><path d="M26 92h108"/><circle cx="48" cy="108" r="6"/><circle cx="112" cy="108" r="6"/><path d="M42 126v16M118 126v16"/><path d="M26 44h-8v20M134 44h8v20"/></svg>
-      <figcaption>버스</figcaption>
-    </figure>
-    <figure>
-      <svg viewBox="0 0 160 160" aria-hidden="true"><circle cx="80" cy="84" r="34"/><circle cx="80" cy="84" r="20"/><path d="M24 30v32M34 30v32M44 30v32M24 62c0 8 20 8 20 0M34 66v72"/><path d="M128 138V30c-12 6-16 26-16 44 0 8 6 12 16 12"/></svg>
-      <figcaption>식당</figcaption>
-    </figure>
+<section class="slide with-side" data-n="07" data-part="s1" data-layout="icons" data-title="그러나">
+  <div class="main-col">
+    <h2 class="title">그러나 차별은 남았다</h2>
+    <div class="icons">
+      <figure>
+        <svg viewBox="0 0 160 160" aria-hidden="true"><path d="M14 74 80 34l66 40"/><path d="M24 68v72h112V68"/><path d="M66 140v-34h28v34"/><rect x="36" y="86" width="20" height="18"/><rect x="104" y="86" width="20" height="18"/><path d="M80 34V10l20 6-20 6"/><path d="M12 140h136"/></svg>
+        <figcaption>학교</figcaption>
+      </figure>
+      <figure>
+        <svg viewBox="0 0 160 160" aria-hidden="true"><rect x="26" y="22" width="108" height="104" rx="14"/><path d="M38 38h84v38H38z"/><path d="M26 92h108"/><circle cx="48" cy="108" r="6"/><circle cx="112" cy="108" r="6"/><path d="M42 126v16M118 126v16"/><path d="M26 44h-8v20M134 44h8v20"/></svg>
+        <figcaption>버스</figcaption>
+      </figure>
+      <figure>
+        <svg viewBox="0 0 160 160" aria-hidden="true"><circle cx="80" cy="84" r="34"/><circle cx="80" cy="84" r="20"/><path d="M24 30v32M34 30v32M44 30v32M24 62c0 8 20 8 20 0M34 66v72"/><path d="M128 138V30c-12 6-16 26-16 44 0 8 6 12 16 12"/></svg>
+        <figcaption>식당</figcaption>
+      </figure>
+    </div>
+    <p class="body">인종에 따라 따로 쓰게 했다</p>
   </div>
-  <p class="body">인종에 따라 따로 쓰게 했다</p>
+  <div class="side-col">
+    <figure class="ph"><img src="images/segregation-sign.jpg" data-desc="인종에 따라 나눈 표지판 (1950년대 미국 남부)" data-page="추가 요청 사진" alt="인종에 따라 나눈 표지판"></figure>
+    <p class="caption">인종에 따라 나눈 표지판 (미국 남부)</p>
+  </div>
   <aside class="notes">남부의 여러 주에서 학교, 버스 좌석, 식당, 화장실 등을 인종에 따라 나누었다. 노예제는 없어졌지만 평등해진 것은 아니었다.</aside>
 </section>
 
@@ -480,17 +742,29 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 12. 민권법 -->
-<section class="slide" data-n="12" data-part="s1" data-layout="fact" data-title="민권법">
-  <p class="big">1964</p>
-  <p class="headline">민권법 제정</p>
-  <p class="desc">인종 차별을 불법으로 규정</p>
+<section class="slide with-side" data-n="12" data-part="s1" data-layout="fact" data-title="민권법">
+  <div class="main-col">
+    <p class="big">1964</p>
+    <p class="headline">민권법 제정</p>
+    <p class="desc">인종 차별을 불법으로 규정</p>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/civil-rights-act-1964.jpg" data-desc="민권법에 서명하는 존슨 대통령 (1964)" data-page="추가 요청 사진" alt="민권법에 서명하는 존슨 대통령"></figure>
+    <p class="caption">민권법에 서명하는 존슨 대통령 (1964)</p>
+  </div>
 </section>
 
 <!-- 13. 참정권 -->
-<section class="slide" data-n="13" data-part="s1" data-layout="fact" data-title="참정권">
-  <p class="big">1965</p>
-  <p class="headline">모든 흑인에게 완전한 참정권 보장</p>
-  <div class="term-block small"><span class="term">민권</span><span class="def">국민의 권리. 특히 참정권을 가리킨다</span></div>
+<section class="slide with-side" data-n="13" data-part="s1" data-layout="fact" data-title="참정권">
+  <div class="main-col">
+    <p class="big">1965</p>
+    <p class="headline">모든 흑인에게 완전한 참정권 보장</p>
+    <div class="term-block small"><span class="term">민권</span><span class="def">국민의 권리. 특히 참정권을 가리킨다</span></div>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/selma-1965.jpg" data-desc="투표권을 요구하는 셀마–몽고메리 행진 (1965)" data-page="추가 요청 사진" alt="셀마–몽고메리 행진"></figure>
+    <p class="caption">투표권을 요구하는 셀마–몽고메리 행진 (1965)</p>
+  </div>
   <aside class="notes">참정권은 선거에 참여할 권리. 참고로 이때 만들어진 법이 투표권법이지만 교과서에는 법 이름이 나오지 않는다.</aside>
 </section>
 
@@ -503,22 +777,34 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 15. 아파르트헤이트 -->
-<section class="slide" data-n="15" data-part="s1" data-layout="term" data-title="아파르트헤이트">
-  <div class="term-block">
-    <p class="term">아파르트헤이트</p>
-    <p class="def">인종 분리 정책을 실시하고 흑인의 참정권을 부정한 극단적인 인종 차별 정책</p>
-    <p class="caption">1950년대 흑인은 백인이 사는 도시에 들어갈 수 없거나, 백인과 같은 대중교통을 탈 수 없었다</p>
+<section class="slide with-side" data-n="15" data-part="s1" data-layout="term" data-title="아파르트헤이트">
+  <div class="main-col">
+    <div class="term-block">
+      <p class="term">아파르트헤이트</p>
+      <p class="def">인종 분리 정책을 실시하고 흑인의 참정권을 부정한 극단적인 인종 차별 정책</p>
+      <p class="caption">1950년대 흑인은 백인이 사는 도시에 들어갈 수 없거나, 백인과 같은 대중교통을 탈 수 없었다</p>
+    </div>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/apartheid-sign.jpg" data-desc="'백인 전용' 표지판 (남아프리카 공화국)" data-page="추가 요청 사진" alt="백인 전용 표지판"></figure>
+    <p class="caption">'백인 전용' 표지판 (남아프리카 공화국)</p>
   </div>
 </section>
 
 <!-- 16. 넬슨 만델라 -->
-<section class="slide" data-n="16" data-part="s1" data-layout="points" data-title="넬슨 만델라">
-  <h2 class="title">넬슨 만델라</h2>
-  <ul class="points">
-    <li>아파르트헤이트에 맞서 흑인 민권 운동을 이끌었다</li>
-    <li>비폭력·불복종 운동을 펼쳤다</li>
-    <li>이 과정에서 감옥에 갇혔다</li>
-  </ul>
+<section class="slide with-side" data-n="16" data-part="s1" data-layout="points" data-title="넬슨 만델라">
+  <div class="main-col">
+    <h2 class="title">넬슨 만델라</h2>
+    <ul class="points">
+      <li>아파르트헤이트에 맞서 흑인 민권 운동을 이끌었다</li>
+      <li>비폭력·불복종 운동을 펼쳤다</li>
+      <li>이 과정에서 감옥에 갇혔다</li>
+    </ul>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/robben-island.jpg" data-desc="넬슨 만델라가 갇혔던 로벤섬 감방" data-page="추가 요청 사진" alt="로벤섬 감방"></figure>
+    <p class="caption">넬슨 만델라가 갇혔던 로벤섬 감방</p>
+  </div>
   <aside class="notes">27년 넘게 수감되었다(1962~1990). 참고: 만델라는 1960년대 초 무장 투쟁 노선을 택하기도 했고 이것이 수감 이유가 되었다. 교과서는 비폭력·불복종 중심으로 서술하므로, 학생이 물으면 보충한다.</aside>
 </section>
 
@@ -531,10 +817,16 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 18. 그 후 (선택) -->
-<section class="slide" data-n="18" data-part="s1" data-layout="fact" data-optional="true" data-title="그 후">
-  <p class="big">1994</p>
-  <p class="headline">모든 인종이 참여한 첫 선거</p>
-  <p class="desc">넬슨 만델라, 대통령에 당선</p>
+<section class="slide with-side" data-n="18" data-part="s1" data-layout="fact" data-optional="true" data-title="그 후">
+  <div class="main-col">
+    <p class="big">1994</p>
+    <p class="headline">모든 인종이 참여한 첫 선거</p>
+    <p class="desc">넬슨 만델라, 대통령에 당선</p>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/sa-election-1994.jpg" data-desc="투표하려고 줄 선 사람들 (남아프리카 공화국, 1994)" data-page="추가 요청 사진" alt="투표하려고 줄 선 사람들"></figure>
+    <p class="caption">투표하려고 줄 선 사람들 (1994)</p>
+  </div>
 </section>
 
 <!-- 19. 질문 (판서) -->
@@ -552,10 +844,16 @@ figure.ph.cl{position:absolute}
 <!-- ───────── 여성 운동 (21–30) ───────── -->
 
 <!-- 21. 참정권 획득 -->
-<section class="slide" data-n="21" data-part="s1" data-layout="fact" data-title="참정권 획득">
-  <p class="big">참정권</p>
-  <p class="headline">두 차례 세계 대전 전후</p>
-  <p class="desc">여성들은 끊임없는 노력으로 남성과 동등한 참정권을 얻었다</p>
+<section class="slide with-side" data-n="21" data-part="s1" data-layout="fact" data-title="참정권 획득">
+  <div class="main-col">
+    <p class="big">참정권</p>
+    <p class="headline">두 차례 세계 대전 전후</p>
+    <p class="desc">여성들은 끊임없는 노력으로 남성과 동등한 참정권을 얻었다</p>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/suffragettes.jpg" data-desc="참정권을 요구하는 여성들 (20세기 초 영국)" data-page="추가 요청 사진" alt="참정권을 요구하는 여성들"></figure>
+    <p class="caption">참정권을 요구하는 여성들 (20세기 초 영국)</p>
+  </div>
   <aside class="notes">"그런데 투표를 할 수 있게 된 뒤에는 차별이 사라졌을까요?"</aside>
 </section>
 
@@ -568,17 +866,32 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 23. 답 -->
-<section class="slide" data-n="23" data-part="s1" data-layout="fact" data-title="답">
-  <p class="big">1967</p>
-  <p class="headline">번호표를 달고 정식으로 참가한 최초의 여성</p>
-  <p class="desc">감독관의 저지에도 끝까지 완주했다</p>
+<section class="slide with-side" data-n="23" data-part="s1" data-layout="fact" data-title="답">
+  <div class="main-col">
+    <p class="big">1967</p>
+    <p class="headline">번호표를 달고 정식으로 참가한 최초의 여성</p>
+    <p class="desc">감독관의 저지에도 끝까지 완주했다</p>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/boston-1967.jpg" data-focus="30% 60%" data-desc="보스턴 마라톤에서 저지당하는 여성 주자" data-page="교과서 229쪽" alt="보스턴 마라톤에서 저지당하는 여성 주자"></figure>
+    <p class="caption">보스턴 마라톤 대회 (1967)</p>
+  </div>
   <aside class="notes">당시에는 남성만 참가하는 것이 당연해서 신청서에 성별 칸이 없었다. 참고: 1966년에 번호표 없이 비공식으로 달린 여성이 있었기 때문에 '정식 참가'로 표현한다.</aside>
 </section>
 
 <!-- 24. 공식 허용 -->
-<section class="slide" data-n="24" data-part="s1" data-layout="fact" data-title="공식 허용">
-  <p class="big">1972</p>
-  <p class="headline">보스턴 마라톤, 여성 참가를 공식 허용</p>
+<section class="slide with-side" data-n="24" data-part="s1" data-layout="fact" data-title="공식 허용">
+  <div class="main-col">
+    <p class="big">1972</p>
+    <p class="headline">보스턴 마라톤, 여성 참가를 공식 허용</p>
+  </div>
+  <div class="side-col">
+    <div class="steps2">
+      <div class="st2"><span class="st2-y">1967</span><span class="st2-t">감독관의 저지에도 끝까지 완주</span></div>
+      <div class="st2-arrow"></div>
+      <div class="st2 on"><span class="st2-y">1972</span><span class="st2-t">여성 참가 공식 허용</span></div>
+    </div>
+  </div>
 </section>
 
 <!-- 25. 질문 (선택) -->
@@ -591,6 +904,7 @@ figure.ph.cl{position:absolute}
 <section class="slide" data-n="26" data-part="s1" data-layout="photo" data-title="1971년 영국">
   <figure class="ph photo-main"><img src="images/uk-women-1971.jpg" data-desc="행진하는 영국 여성들 (1971)" data-page="교과서 229쪽" alt="행진하는 영국 여성들"></figure>
   <div class="photo-side"><p class="caption">행진하는 영국 여성들 (1971)</p></div>
+  <p class="body photo-line">교육과 취업, 직장 내 급여의 평등 등을 요구하며 행진했다</p>
 </section>
 
 <!-- 27. 피켓 읽기 · 확대 배율(data-zoom)과 위치(data-focus)는 사진을 넣은 뒤 피켓이 보이게 조정한다 -->
@@ -601,14 +915,23 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 28. 요구 -->
-<section class="slide" data-n="28" data-part="s1" data-layout="points" data-title="요구">
+<section class="slide" data-n="28" data-part="s1" data-layout="icons" data-title="요구">
   <h2 class="title">여성들이 요구한 것</h2>
-  <ul class="points">
-    <li>교육의 평등</li>
-    <li>취업의 평등</li>
-    <li>임금의 평등</li>
-  </ul>
-  <p class="caption">일상에 남아 있던 성차별과 성 역할 분리에 도전했다</p>
+  <div class="icons">
+    <figure>
+      <svg viewBox="0 0 160 160" aria-hidden="true"><path d="M80 44c-16-12-38-16-62-14v94c24-2 46 2 62 14 16-12 38-16 62-14V30c-24-2-46 2-62 14z"/><path d="M80 44v94"/><path d="M34 54c12 0 22 2 32 6M34 76c12 0 22 2 32 6M94 60c10-4 20-6 32-6M94 82c10-4 20-6 32-6"/></svg>
+      <figcaption>교육의 평등</figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 160 160" aria-hidden="true"><rect x="20" y="54" width="120" height="82" rx="8"/><path d="M58 54V40a8 8 0 0 1 8-8h28a8 8 0 0 1 8 8v14"/><path d="M20 88h120"/><path d="M70 80h20v16H70z"/></svg>
+      <figcaption>취업의 평등</figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 160 160" aria-hidden="true"><rect x="16" y="46" width="128" height="72" rx="6"/><circle cx="80" cy="82" r="20"/><path d="M34 62v40M126 62v40"/><path d="M28 132h104"/></svg>
+      <figcaption>임금의 평등</figcaption>
+    </figure>
+  </div>
+  <p class="caption" style="margin-top:56px">일상에 남아 있던 성차별과 성 역할 분리에 도전했다</p>
 </section>
 
 <!-- 29. 핵심 용어 (판서) -->
@@ -617,6 +940,10 @@ figure.ph.cl{position:absolute}
     <p class="from">남성 중심<br>사회 체제</p>
     <svg class="arrow" viewBox="0 0 200 64" aria-hidden="true"><path d="M0 32h160" stroke="currentColor" stroke-width="12"/><path d="M200 32 152 4v56z" fill="currentColor"/></svg>
     <p class="to">인식의 전환과<br>현실적 변화</p>
+  </div>
+  <div class="term-more">
+    <p class="caption">여성 운동은 지금도 계속되며, 관심의 폭을 넓혀 가고 있다</p>
+    <div class="chips"><span>인종</span><span>국적</span><span>종교</span><span>계층</span><span>문화적 다양성</span></div>
   </div>
   <aside class="notes">'스스로 확인하기' 빈칸 정답은 '남성'. 여성 운동은 지금도 계속되며, 인종·국적·종교·계층·문화적 다양성으로 관심을 넓혀 가고 있다. ✏️ 판서: 여성 행.</aside>
 </section>
@@ -628,6 +955,7 @@ figure.ph.cl{position:absolute}
     <h2 class="title">지금도 계속된다</h2>
     <p class="caption">사우디아라비아, 2018년 6월 24일부터 여성 운전 허용</p>
   </div>
+  <p class="body photo-line">1990년 즈음부터 여성들이 기습적으로 운전하며 항의해 왔다</p>
   <aside class="notes">1990년 무렵부터 여성들이 기습적으로 운전하며 항의하고 꾸준히 요구해 온 결과다.</aside>
 </section>
 
@@ -664,9 +992,9 @@ figure.ph.cl{position:absolute}
 <section class="slide" data-n="32" data-part="s2" data-layout="roadmap" data-title="구분 화면">
   <p class="rm-target teacher">목표 19분</p>
   <div class="rm-cards">
-    <div class="rm-card s1 off"><div class="rm-num">1</div><p class="rm-q">사람은 누구나 평등한가?</p><p class="rm-mv">민권 운동 · 여성 운동</p></div>
-    <div class="rm-card s2 on"><div class="rm-num">2</div><p class="rm-q">일하는 사람에게는 어떤 권리가 필요할까?</p><p class="rm-mv">노동 운동</p></div>
-    <div class="rm-card s3 off"><div class="rm-num">3</div><p class="rm-q">인류의 생존을 위협하는 문제는 어떻게 해결할까?</p><p class="rm-mv">반전 평화 운동 · 환경 운동</p></div>
+    <div class="rm-card s1 off"><figure class="ph"><img src="images/king-march.jpg" data-focus="15% 45%" data-desc="연설하는 마틴 루서 킹과 군중" data-page="교과서 228쪽" alt=""></figure><div class="rm-body"><div class="rm-num">1</div><p class="rm-q">사람은 누구나 평등한가?</p><p class="rm-mv">민권 운동 · 여성 운동</p></div></div>
+    <div class="rm-card s2 on"><figure class="ph"><img src="images/eight-hours-cartoon.jpg" data-focus="50% 10%" data-desc="1일 8시간 노동을 옹호하는 노동 신문의 만화" data-page="교과서 230쪽" alt=""></figure><div class="rm-body"><div class="rm-num">2</div><p class="rm-q">일하는 사람에게는 어떤 권리가 필요할까?</p><p class="rm-mv">노동 운동</p></div></div>
+    <div class="rm-card s3 off"><figure class="ph"><img src="images/vietnam-protest.jpg" data-focus="50% 25%" data-desc="베트남 전쟁 반대 시위 (미국)" data-page="교과서 232쪽" alt=""></figure><div class="rm-body"><div class="rm-num">3</div><p class="rm-q">인류의 생존을 위협하는 문제는 어떻게 해결할까?</p><p class="rm-mv">반전 평화 운동 · 환경 운동</p></div></div>
   </div>
 </section>
 
@@ -689,18 +1017,34 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 34. 노동절 -->
-<section class="slide" data-n="34" data-part="s2" data-layout="fact" data-title="노동절">
-  <p class="big">노동절</p>
-  <p class="headline">근로자의 날 → 2026년부터 '노동절'</p>
-  <p class="desc">2026년부터 법정 공휴일, 학교도 쉬는 날</p>
+<section class="slide with-side" data-n="34" data-part="s2" data-layout="fact" data-title="노동절">
+  <div class="main-col">
+    <p class="big">노동절</p>
+    <p class="headline">근로자의 날 → 2026년부터 '노동절'</p>
+    <p class="desc">2026년부터 법정 공휴일, 학교도 쉬는 날</p>
+  </div>
+  <div class="side-col" style="align-items:center">
+    <div class="tearcal" aria-hidden="true">
+      <div class="tc-top">2026년 5월</div>
+      <div class="tc-day">1</div>
+      <div class="tc-week">금요일</div>
+      <div class="tc-label">노동절</div>
+    </div>
+  </div>
   <aside class="notes">교과서 230쪽에는 '근로자의 날'로 나온다. 2025년 10월 법률 개정으로 2026년부터 이름이 '노동절'로 바뀌었고, 2026년 4월에 법정 공휴일로 지정되었다.</aside>
 </section>
 
 <!-- 35. 왜 5월 1일일까? -->
-<section class="slide" data-n="35" data-part="s2" data-layout="fact" data-title="왜 5월 1일일까?">
-  <h2 class="title">왜 하필 5월 1일일까?</h2>
-  <p class="big">1886</p>
-  <p class="desc">미국 시카고 노동자들이 하루 8시간 노동을 요구하며 대규모 파업</p>
+<section class="slide with-side" data-n="35" data-part="s2" data-layout="fact" data-title="왜 5월 1일일까?">
+  <div class="main-col">
+    <h2 class="title">왜 하필 5월 1일일까?</h2>
+    <p class="big">1886</p>
+    <p class="desc">미국 시카고 노동자들이 하루 8시간 노동을 요구하며 대규모 파업</p>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/haymarket-1886.jpg" data-desc="1886년 시카고 헤이마켓 집회를 그린 판화" data-page="추가 요청 사진" alt="1886년 시카고 헤이마켓 집회"></figure>
+    <p class="caption">1886년 시카고 노동자 집회를 그린 판화</p>
+  </div>
   <aside class="notes">진압 과정에서 많은 사람이 죽거나 다치고 체포되었다.</aside>
 </section>
 
@@ -713,48 +1057,83 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 37. 산업 혁명 복습 (선택) -->
-<section class="slide" data-n="37" data-part="s2" data-layout="points" data-optional="true" data-title="산업 혁명 복습">
-  <h2 class="title">산업 혁명기 노동자의 삶</h2>
-  <ul class="points">
-    <li>장시간 노동</li>
-    <li>낮은 임금</li>
-    <li>열악한 노동 환경</li>
-  </ul>
+<section class="slide with-side" data-n="37" data-part="s2" data-layout="points" data-optional="true" data-title="산업 혁명 복습">
+  <div class="main-col">
+    <h2 class="title">산업 혁명기 노동자의 삶</h2>
+    <ul class="points">
+      <li>장시간 노동</li>
+      <li>낮은 임금</li>
+      <li>열악한 노동 환경</li>
+    </ul>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/child-labor.jpg" data-desc="산업 혁명기 공장에서 일하는 아이들" data-page="추가 요청 사진 (앞 단원 교과서에도 있음)" alt="산업 혁명기 공장에서 일하는 아이들"></figure>
+    <p class="caption">산업 혁명기 공장에서 일하는 아이들</p>
+  </div>
   <aside class="notes">앞 단원 복습. 화면을 보여 주기 전에 학생에게 먼저 물어도 좋다.</aside>
 </section>
 
 <!-- 38. 메이데이 -->
-<section class="slide" data-n="38" data-part="s2" data-layout="fact" data-title="메이데이">
-  <p class="big">1889</p>
-  <p class="desc">프랑스 파리에서 세계의 노동자들이 5월 1일을 '메이데이'로 정했다</p>
+<section class="slide with-side" data-n="38" data-part="s2" data-layout="fact" data-title="메이데이">
+  <div class="main-col">
+    <p class="big">1889</p>
+    <p class="desc">프랑스 파리에서 세계의 노동자들이 5월 1일을 '메이데이'로 정했다</p>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/mayday-1890s.jpg" data-desc="초기 메이데이 집회 (1890년대)" data-page="추가 요청 사진" alt="초기 메이데이 집회"></figure>
+    <p class="caption">초기 메이데이 집회 (1890년대)</p>
+  </div>
   <aside class="notes">미국 노동자들의 8시간 노동 운동을 기리기 위해서였다.</aside>
 </section>
 
 <!-- 39. 노동조합 -->
-<section class="slide" data-n="39" data-part="s2" data-layout="points" data-title="노동조합">
-  <h2 class="title">노동자들은 어떻게 권리를 지켰을까?</h2>
-  <ul class="points">
-    <li>노동조합을 만들었다</li>
-  </ul>
-  <p class="caption">노동조합은 노동자들이 노동 조건을 지키고 높이기 위해 함께 만든 단체</p>
-  <aside class="notes">노동자 한 명이 회사와 대등하게 이야기하기는 어렵기 때문이다.</aside>
+<section class="slide with-side" data-n="39" data-part="s2" data-layout="points" data-title="노동조합">
+  <div class="main-col">
+    <h2 class="title">노동자들은 어떻게 권리를 지켰을까?</h2>
+    <ul class="points">
+      <li>노동조합을 만들었다</li>
+    </ul>
+    <p class="caption">노동조합은 노동자들이 노동 조건을 지키고 높이기 위해 함께 만든 단체</p>
+  </div>
+  <div class="side-col">
+    <div class="doc">
+      <figure class="ph contain"><img src="images/weimar-constitution.jpg" data-fit="contain" data-desc="바이마르 헌법" data-page="교과서 231쪽" alt="바이마르 헌법"></figure>
+      <div>
+        <p class="doc-y">1919<br>바이마르 헌법</p>
+        <p class="doc-q">제159조 노동 조건 및 경제 조건을 보호하고 개선하기 위하여 결사의 자유는 누구에게나 보장된다.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">노동자 한 명이 회사와 대등하게 이야기하기는 어렵기 때문이다. 오른쪽은 교과서 231쪽 탐구 자료(바이마르 헌법).</aside>
 </section>
 
 <!-- 40. 단체 교섭권 -->
-<section class="slide" data-n="40" data-part="s2" data-layout="term" data-title="단체 교섭권">
-  <div class="term-block">
-    <p class="term">단체 교섭권</p>
-    <p class="def">노동조합의 대표자가 노동 조건의 유지·개선이나 노동 협약의 체결에 대해 직접 교섭할 수 있는 권리</p>
-    <p class="caption">쉽게 말해, 노동자 대표가 회사와 협상할 수 있는 권리</p>
+<section class="slide with-side" data-n="40" data-part="s2" data-layout="term" data-title="단체 교섭권">
+  <div class="main-col">
+    <div class="term-block">
+      <p class="term">단체 교섭권</p>
+      <p class="def">노동조합의 대표자가 노동 조건의 유지·개선이나 노동 협약의 체결에 대해 직접 교섭할 수 있는 권리</p>
+      <p class="caption">쉽게 말해, 노동자 대표가 회사와 협상할 수 있는 권리</p>
+    </div>
   </div>
-  <aside class="notes">'스스로 확인하기' 빈칸 정답은 '단체'.</aside>
+  <div class="side-col">
+    <figure class="ph"><img src="images/wagner-act-1935.jpg" data-desc="와그너법에 서명하는 루스벨트" data-page="교과서 231쪽" alt="와그너법에 서명하는 루스벨트"></figure>
+    <p class="caption">와그너법에 서명하는 루스벨트 (1935) · 노동자의 단결권과 단체 교섭권을 인정한 미국의 법</p>
+  </div>
+  <aside class="notes">'스스로 확인하기' 빈칸 정답은 '단체'. 오른쪽은 교과서 231쪽 탐구 자료(와그너법).</aside>
 </section>
 
 <!-- 41. 국제 노동 기구 -->
-<section class="slide" data-n="41" data-part="s2" data-layout="fact" data-title="국제 노동 기구">
-  <p class="big">1919</p>
-  <p class="headline">국제 노동 기구(ILO) 설립</p>
-  <p class="desc">베르사유 조약에 근거하여, 노동 조건을 개선하기 위해 세워졌다</p>
+<section class="slide with-side" data-n="41" data-part="s2" data-layout="fact" data-title="국제 노동 기구">
+  <div class="main-col">
+    <p class="big">1919</p>
+    <p class="headline">국제 노동 기구(ILO) 설립</p>
+    <p class="desc">베르사유 조약에 근거하여, 노동 조건을 개선하기 위해 세워졌다</p>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/ilo-1919.jpg" data-desc="국제 노동 기구 첫 총회 (1919, 워싱턴)" data-page="추가 요청 사진" alt="국제 노동 기구 첫 총회"></figure>
+    <p class="caption">국제 노동 기구 첫 총회 (1919)</p>
+  </div>
 </section>
 
 <!-- 42. 요구가 제도로 -->
@@ -774,21 +1153,22 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 43. 필라델피아 선언 · 사진이 없으면 사진 자리가 숨겨진다 -->
-<section class="slide" data-n="43" data-part="s2" data-layout="fact" data-title="필라델피아 선언">
-  <div class="fact-row">
-    <div class="fact-text">
-      <p class="big">1944</p>
-      <p class="headline">필라델피아 선언</p>
-      <p class="desc">국제 노동 기구 총회가 미국 필라델피아에서 채택했다</p>
-    </div>
-    <figure class="ph fact-figure"><img src="images/philadelphia-1944.jpg" data-optional-image="true" data-desc="필라델피아 총회에 참석한 각국 사람들" data-page="교과서 231쪽" alt="필라델피아 총회에 참석한 각국 사람들"></figure>
+<section class="slide with-side" data-n="43" data-part="s2" data-layout="fact" data-title="필라델피아 선언">
+  <div class="main-col">
+    <p class="big">1944</p>
+    <p class="headline">필라델피아 선언</p>
+    <p class="desc">국제 노동 기구 총회가 미국 필라델피아에서 채택했다</p>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/philadelphia-1944.jpg" data-optional-image="true" data-desc="필라델피아 총회에 참석한 각국 사람들" data-page="교과서 231쪽" alt="필라델피아 총회에 참석한 각국 사람들"></figure>
+    <p class="caption">필라델피아 총회에 참석한 각국 사람들</p>
   </div>
   <aside class="notes">'스스로 확인하기' 빈칸 정답은 '필라델피아'.</aside>
 </section>
 
 <!-- 44. 노동은 상품이 아니다 -->
 <section class="slide" data-n="44" data-part="s2" data-layout="big-sentence" data-title="노동은 상품이 아니다">
-  <p class="bs">노동은 상품이 아니다.</p>
+  <p class="bs huge">노동은 상품이 아니다.</p>
   <p class="caption bs-note">필라델피아 선언 제1부</p>
   <aside class="notes">"이 말은 무슨 뜻일까요?" → 노동자를 돈을 버는 도구로만 대해서는 안 된다는 뜻.</aside>
 </section>
@@ -805,6 +1185,7 @@ figure.ph.cl{position:absolute}
   <div class="photo-side">
     <h2 class="title">지금도 계속된다</h2>
     <p class="caption">세계 산재 사망 노동자 추모의 날 (4월 28일)</p>
+    <p class="caption">국제 자유 노동조합 연맹(ICFTU)이 지정</p>
   </div>
   <aside class="notes">국제 자유 노동조합 연맹(ICFTU)이 지정했다. 산업 현장이 다양해지면서 위험한 상황에 놓이는 노동자가 늘고 있다.</aside>
 </section>
@@ -823,23 +1204,23 @@ figure.ph.cl{position:absolute}
 <section class="slide" data-n="48" data-part="s3" data-layout="roadmap" data-title="구분 화면">
   <p class="rm-target teacher">목표 28분</p>
   <div class="rm-cards">
-    <div class="rm-card s1 off"><div class="rm-num">1</div><p class="rm-q">사람은 누구나 평등한가?</p><p class="rm-mv">민권 운동 · 여성 운동</p></div>
-    <div class="rm-card s2 off"><div class="rm-num">2</div><p class="rm-q">일하는 사람에게는 어떤 권리가 필요할까?</p><p class="rm-mv">노동 운동</p></div>
-    <div class="rm-card s3 on"><div class="rm-num">3</div><p class="rm-q">인류의 생존을 위협하는 문제는 어떻게 해결할까?</p><p class="rm-mv">반전 평화 운동 · 환경 운동</p></div>
+    <div class="rm-card s1 off"><figure class="ph"><img src="images/king-march.jpg" data-focus="15% 45%" data-desc="연설하는 마틴 루서 킹과 군중" data-page="교과서 228쪽" alt=""></figure><div class="rm-body"><div class="rm-num">1</div><p class="rm-q">사람은 누구나 평등한가?</p><p class="rm-mv">민권 운동 · 여성 운동</p></div></div>
+    <div class="rm-card s2 off"><figure class="ph"><img src="images/eight-hours-cartoon.jpg" data-focus="50% 10%" data-desc="1일 8시간 노동을 옹호하는 노동 신문의 만화" data-page="교과서 230쪽" alt=""></figure><div class="rm-body"><div class="rm-num">2</div><p class="rm-q">일하는 사람에게는 어떤 권리가 필요할까?</p><p class="rm-mv">노동 운동</p></div></div>
+    <div class="rm-card s3 on"><figure class="ph"><img src="images/vietnam-protest.jpg" data-focus="50% 25%" data-desc="베트남 전쟁 반대 시위 (미국)" data-page="교과서 232쪽" alt=""></figure><div class="rm-body"><div class="rm-num">3</div><p class="rm-q">인류의 생존을 위협하는 문제는 어떻게 해결할까?</p><p class="rm-mv">반전 평화 운동 · 환경 운동</p></div></div>
   </div>
 </section>
 
 <!-- ───────── 반전 평화 운동 (49–57) ───────── -->
 
 <!-- 49. 베트남 전쟁 (선택) · 지도가 없으면 지도 자리가 숨겨진다 -->
-<section class="slide" data-n="49" data-part="s3" data-layout="fact" data-optional="true" data-title="베트남 전쟁">
-  <div class="fact-row">
-    <div class="fact-text">
-      <p class="big">베트남 전쟁</p>
-      <p class="headline">1964~1975</p>
-      <p class="desc">냉전 속에서 미국이 군대를 보낸 전쟁</p>
-    </div>
-    <figure class="ph fact-figure map contain"><img src="images/vietnam-map.png" data-optional-image="true" data-fit="contain" data-desc="베트남 위치 지도" data-page="교사가 준비" alt="베트남 위치 지도"></figure>
+<section class="slide with-side" data-n="49" data-part="s3" data-layout="fact" data-optional="true" data-title="베트남 전쟁">
+  <div class="main-col">
+    <p class="big">베트남 전쟁</p>
+    <p class="headline">1964~1975</p>
+    <p class="desc">냉전 속에서 미국이 군대를 보낸 전쟁</p>
+  </div>
+  <div class="side-col">
+    <figure class="ph contain"><img src="images/vietnam-map.png" data-optional-image="true" data-fit="contain" data-desc="베트남 위치 지도" data-page="교사가 준비" alt="베트남 위치 지도"></figure>
   </div>
   <aside class="notes">앞 단원의 냉전 내용을 짧게 복습한다.</aside>
 </section>
@@ -857,12 +1238,18 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 52. 결과 -->
-<section class="slide" data-n="52" data-part="s3" data-layout="points" data-title="결과">
-  <h2 class="title">1960년대 후반</h2>
-  <ul class="points">
-    <li>베트남 전쟁 반대 운동이 전 세계로 퍼졌다</li>
-    <li>미군이 베트남에서 철수하는 데 큰 영향을 미쳤다</li>
-  </ul>
+<section class="slide with-side" data-n="52" data-part="s3" data-layout="points" data-title="결과">
+  <div class="main-col">
+    <h2 class="title">1960년대 후반</h2>
+    <ul class="points">
+      <li>베트남 전쟁 반대 운동이 전 세계로 퍼졌다</li>
+      <li>미군이 베트남에서 철수하는 데 큰 영향을 미쳤다</li>
+    </ul>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/us-withdrawal-1973.jpg" data-desc="베트남에서 철수하는 미군 (1973)" data-page="추가 요청 사진" alt="베트남에서 철수하는 미군"></figure>
+    <p class="caption">베트남에서 철수하는 미군 (1973)</p>
+  </div>
   <aside class="notes">군대를 보낸 미국뿐 아니라 여러 나라에서 반전 평화 운동이 일어났다.</aside>
 </section>
 
@@ -874,10 +1261,17 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 54. 핵 확산 금지 조약 -->
-<section class="slide" data-n="54" data-part="s3" data-layout="term" data-title="핵 확산 금지 조약">
-  <div class="term-block">
-    <p class="term">핵 확산 금지 조약(NPT)</p>
-    <p class="def">핵무기 같은 대량 살상 무기가 더 많은 나라로 퍼지는 것을 막기 위한 국제 협약</p>
+<section class="slide with-side" data-n="54" data-part="s3" data-layout="term" data-title="핵 확산 금지 조약">
+  <div class="main-col">
+    <div class="term-block">
+      <p class="term">핵 확산 금지 조약(NPT)</p>
+      <p class="def">핵무기 같은 대량 살상 무기가 더 많은 나라로 퍼지는 것을 막기 위한 국제 협약</p>
+      <p class="caption">핵폭탄 등 대량 살상 무기를 가진 나라가 늘어나면서 체결되었다</p>
+    </div>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/npt-1968.jpg" data-desc="핵 확산 금지 조약 서명 (1968)" data-page="추가 요청 사진" alt="핵 확산 금지 조약 서명"></figure>
+    <p class="caption">핵 확산 금지 조약 서명 (1968)</p>
   </div>
   <aside class="notes">1968년 체결, 1970년 발효(교과서에는 연도가 없다). '스스로 확인하기' 빈칸 정답은 '핵'.</aside>
 </section>
@@ -887,7 +1281,7 @@ figure.ph.cl{position:absolute}
   <figure class="ph photo-main"><img src="images/iraq-protest-2003.jpg" data-desc="이라크 전쟁 반대 운동 (이탈리아)" data-page="교과서 232쪽" alt="이라크 전쟁 반대 운동"></figure>
   <div class="photo-side">
     <p class="big">2003</p>
-    <p class="caption">미국의 이라크 침공 · 이라크 전쟁 반대 운동 (이탈리아)</p>
+    <p class="caption">미국의 이라크 침공 (~2011) · 이라크 전쟁 반대 운동 (이탈리아)</p>
   </div>
 </section>
 
@@ -912,6 +1306,7 @@ figure.ph.cl{position:absolute}
 <!-- 58. 대표적인 환경 문제 -->
 <section class="slide" data-n="58" data-part="s3" data-layout="icons" data-title="대표적인 환경 문제">
   <h2 class="title">대표적인 환경 문제</h2>
+  <p class="caption icons-sub">산업화와 인구 증가로 자원 소비량과 폐기물의 양이 급증했다</p>
   <div class="icons four">
     <figure>
       <svg viewBox="0 0 160 160" aria-hidden="true"><circle cx="58" cy="86" r="42"/><path d="M16 86h84M58 44c-16 14-16 70 0 84M58 44c16 14 16 70 0 84"/><path d="M118 112V30a10 10 0 0 1 20 0v82"/><circle cx="128" cy="126" r="16"/><path d="M128 110V58"/></svg>
@@ -965,12 +1360,18 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 62. 원인 -->
-<section class="slide" data-n="62" data-part="s3" data-layout="points" data-title="원인">
-  <h2 class="title">왜 줄어들었을까?</h2>
-  <ul class="points">
-    <li>아랄해로 흘러들던 강물을 목화밭에 대려고 대량으로 끌어 썼다</li>
-    <li>호수가 말라붙고 사막화가 일어났다</li>
-  </ul>
+<section class="slide with-side" data-n="62" data-part="s3" data-layout="points" data-title="원인">
+  <div class="main-col">
+    <h2 class="title">왜 줄어들었을까?</h2>
+    <ul class="points">
+      <li>아랄해로 흘러들던 강물을 목화밭에 대려고 대량으로 끌어 썼다</li>
+      <li>호수가 말라붙고 사막화가 일어났다</li>
+    </ul>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/aral-ships.jpg" data-desc="말라붙은 아랄해 바닥에 남은 배" data-page="추가 요청 사진" alt="말라붙은 아랄해 바닥에 남은 배"></figure>
+    <p class="caption">말라붙은 아랄해 바닥에 남은 배</p>
+  </div>
   <aside class="notes">1960년대 소련 시기부터 아무다리야강과 시르다리야강의 물을 관개에 끌어 썼다. 지구 온난화가 주된 원인이 아니라는 점에 유의한다. 교과서도 '사막화'의 사례로 제시한다. 드러난 호수 바닥의 소금 먼지는 주변 주민의 건강과 농업에 피해를 주었다.</aside>
 </section>
 
@@ -989,43 +1390,59 @@ figure.ph.cl{position:absolute}
 </section>
 
 <!-- 65. 리우 선언 -->
-<section class="slide" data-n="65" data-part="s3" data-layout="fact" data-title="리우 선언">
-  <p class="big">1992</p>
-  <p class="headline">환경과 개발에 관한 공동 선언 (리우 선언)</p>
-  <p class="desc">국제 연합 환경 개발 회의에서 발표</p>
+<section class="slide with-side" data-n="65" data-part="s3" data-layout="fact" data-title="리우 선언">
+  <div class="main-col">
+    <p class="big">1992</p>
+    <p class="headline">환경과 개발에 관한 공동 선언 (리우 선언)</p>
+    <p class="desc">국제 연합 환경 개발 회의에서 발표</p>
+    <p class="caption chips-label">환경 문제를 해결하기 위해 체결된 국제 협약</p>
+    <div class="chips"><span>생물 다양성 협약</span><span>사막화 방지 협약</span><span>기후 변화 협약</span></div>
+  </div>
+  <div class="side-col">
+    <figure class="ph"><img src="images/rio-1992.jpg" data-desc="리우 환경 개발 회의 (1992)" data-page="추가 요청 사진" alt="리우 환경 개발 회의"></figure>
+    <p class="caption">국제 연합 환경 개발 회의 (1992, 리우데자네이루)</p>
+  </div>
   <aside class="notes">'스스로 확인하기' 빈칸 정답은 '리우 선언'. 생물 다양성 협약, 사막화 방지 협약, 기후 변화 협약 등도 체결되었다.</aside>
 </section>
 
 <!-- 66. 교토 의정서 -->
-<section class="slide" data-n="66" data-part="s3" data-layout="fact" data-title="교토 의정서">
-  <div class="fact-row">
-    <div class="fact-text">
-      <p class="big">1997</p>
-      <p class="headline">교토 의정서</p>
-      <p class="desc">온실가스 감축 의무:<br>선진국만</p>
-    </div>
-    <div class="diagram"><div class="circle">선진국</div></div>
+<section class="slide with-side" data-n="66" data-part="s3" data-layout="fact" data-title="교토 의정서">
+  <div class="main-col">
+    <p class="big">1997</p>
+    <p class="headline">교토 의정서</p>
+    <p class="desc">온실가스 감축 의무:<br>선진국만</p>
+    <ul class="facts-list">
+      <li>최초로 온실가스 감축 비율 제시</li>
+      <li>1990년 수준보다 평균 5.2% 감축</li>
+    </ul>
   </div>
+  <div class="side-col"><div class="diagram"><div class="circle">선진국</div></div></div>
   <aside class="notes">교과서 탐구 ㉠의 정답은 '온실가스'. 1990년 수준보다 평균 5.2% 감축. 한국은 당시 개발 도상국으로 분류되어 감축 의무에서 빠졌다.</aside>
 </section>
 
-<!-- 67. 파리 협정 (판서) · 66번에서 넘어오면 원이 커진다(덱의 유일한 내용 애니메이션) -->
-<section class="slide" data-n="67" data-part="s3" data-layout="fact" data-board="true" data-title="파리 협정">
-  <div class="fact-row">
-    <div class="fact-text">
-      <p class="big">2015</p>
-      <p class="headline">파리 협정</p>
-      <p class="desc">온실가스 감축 의무:<br>선진국과 개발 도상국 모두</p>
-    </div>
-    <div class="diagram"><div class="circle big-circle" data-grow-from="66">선진국 +<br>개발 도상국</div></div>
+<!-- 67. 파리 협정 (판서) · 66번에서 넘어오면 원이 커진다 -->
+<section class="slide with-side" data-n="67" data-part="s3" data-layout="fact" data-board="true" data-title="파리 협정">
+  <div class="main-col">
+    <p class="big">2015</p>
+    <p class="headline">파리 협정</p>
+    <p class="desc">온실가스 감축 의무:<br>선진국과 개발 도상국 모두</p>
+    <ul class="facts-list">
+      <li>온실가스 감축의 구체적인 수치 제시</li>
+      <li>선진국이 개발 도상국의 기후 변화 대처 사업에 지원</li>
+      <li>2023년 이후 5년마다 감축 목표를 높여 제출 및 검증</li>
+    </ul>
   </div>
+  <div class="side-col"><div class="diagram"><div class="circle big-circle" data-grow-from="66">선진국 +<br>개발 도상국</div></div></div>
   <aside class="notes">핵심은 '함께하는 나라가 늘었다'. 참고: 교과서 탐구의 '한국 37% 감축안'은 2015년 제출안이고, 한국은 2021년에 2030년 목표를 2018년 대비 40% 감축으로 높였다. 미국은 2025년 1월 파리 협정 탈퇴를 발표했고 2026년 1월 탈퇴가 발효되었다. 학생이 물으면 '아직 남은 과제'의 예로 다룬다. ✏️ 판서: 환경 행.</aside>
 </section>
 
 <!-- 68. 그린피스 -->
 <section class="slide" data-n="68" data-part="s3" data-layout="photo" data-title="그린피스">
   <figure class="ph photo-main"><img src="images/greenpeace.jpg" data-desc="그린피스 선박" data-page="교과서 233쪽" alt="그린피스 선박"></figure>
-  <div class="photo-side"><p class="caption">그린피스 (1971년 설립)</p></div>
+  <div class="photo-side">
+    <p class="caption">그린피스 (1971년 설립)</p>
+    <p class="caption">핵 실험 반대와 자연 보호 운동 등을 펼치는 국제 환경 보호 단체</p>
+  </div>
   <p class="body photo-line">비정부 기구(NGO)도 환경 운동을 이끈다</p>
   <aside class="notes">핵 실험 반대와 자연 보호 활동을 함께 해 왔다. 반전 평화 운동과도 이어진다.</aside>
 </section>
@@ -1070,13 +1487,13 @@ figure.ph.cl{position:absolute}
      ========================================================== -->
 <template id="pattern-data">
   <div class="pt">
-    <div class="pt-step" data-k="1"><p class="pt-name">문제</p><p class="pt-ex">인종 차별, 성차별, 장시간 노동, 전쟁, 환경 파괴</p></div>
+    <div class="pt-step" data-k="1"><figure class="ph"><img src="images/apartheid-museum.jpg" data-desc="아파르트헤이트 박물관 입구" data-page="교과서 228쪽" alt=""></figure><p class="pt-name">문제</p><p class="pt-ex">인종 차별, 성차별, 장시간 노동, 전쟁, 환경 파괴</p></div>
     <div class="pt-arrow" data-k="2"></div>
-    <div class="pt-step" data-k="2"><p class="pt-name">사람들의 행동</p><p class="pt-ex">행진, 파업, 시위, 국제 연대</p></div>
+    <div class="pt-step" data-k="2"><figure class="ph"><img src="images/uk-women-1971.jpg" data-desc="행진하는 영국 여성들 (1971)" data-page="교과서 229쪽" alt=""></figure><p class="pt-name">사람들의 행동</p><p class="pt-ex">행진, 파업, 시위, 국제 연대</p></div>
     <div class="pt-arrow" data-k="3"></div>
-    <div class="pt-step" data-k="3"><p class="pt-name">법·제도·국제 협약</p><p class="pt-ex">민권법, 국제 노동 기구, 핵 확산 금지 조약, 파리 협정</p></div>
+    <div class="pt-step" data-k="3"><figure class="ph"><img src="images/philadelphia-1944.jpg" data-desc="필라델피아 총회에 참석한 각국 사람들" data-page="교과서 231쪽" alt=""></figure><p class="pt-name">법·제도·국제 협약</p><p class="pt-ex">민권법, 국제 노동 기구, 핵 확산 금지 조약, 파리 협정</p></div>
     <div class="pt-arrow" data-k="4"></div>
-    <div class="pt-step open" data-k="4"><p class="pt-name">아직 남은 과제</p><p class="pt-ex">지금도 남아 있는 차별, 산업 재해, 전쟁, 기후 변화</p></div>
+    <div class="pt-step open" data-k="4"><figure class="ph"><img src="images/aral-2008.jpg" data-desc="아랄해 위성 사진 (2008)" data-page="교과서 233쪽" alt=""></figure><p class="pt-name">아직 남은 과제</p><p class="pt-ex">지금도 남아 있는 차별, 산업 재해, 전쟁, 기후 변화</p></div>
     <div class="pt-tail" data-k="4"></div>
   </div>
 </template>
@@ -1104,7 +1521,8 @@ figure.ph.cl{position:absolute}
 
 </main>
 
-<div id="footer" aria-hidden="true"><span id="digits"></span><span id="skipflag">선택 장 건너뜀</span><span id="pageno"></span></div>
+<div id="sweep" aria-hidden="true"><span></span></div>
+<div id="footer" aria-hidden="true"><span id="digits"></span><span id="motionflag">움직임 끔</span><span id="skipflag">선택 장 건너뜀</span><span id="pageno"></span></div>
 <div id="notes-panel"><div id="notes-head"></div><div id="notes-body"></div></div>
 <div id="overview"><p class="ov-head">전체 장 목록 · 누르면 그 장으로 이동 · Esc로 닫기 · 흐린 장은 선택 장</p><div class="ov-grid"></div></div>
 
@@ -1128,10 +1546,14 @@ figure.ph.cl{position:absolute}
   var notesBody = document.getElementById('notes-body');
   var overview = document.getElementById('overview');
   var overviewGrid = overview.querySelector('.ov-grid');
+  var sweep = document.getElementById('sweep');
   var motionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var PART_NAME = { intro: '도입', s1: '평등', s2: '노동', s3: '생존', outro: '정리' };
+  var PART_COLOR = { intro: ['var(--ink)', '#fff'], s1: ['var(--story-1)', '#fff'], s2: ['var(--story-2)', 'var(--ink)'], s3: ['var(--story-3)', '#fff'], outro: ['var(--ink)', '#fff'] };
 
   var cur = -1;
   var skipMode = false;
+  var motionOn = true;
   var notesOpen = false;
   var overviewOpen = false;
   var overviewBuilt = false;
@@ -1139,6 +1561,7 @@ figure.ph.cl{position:absolute}
   var digitTimer = null;
   var leaveTimer = null;
   var lastSwipe = 0;
+  var playGen = 0;
 
   var PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 4.5l4 4L8 20H4v-4z"/><path d="M13 7l4 4"/></svg>';
 
@@ -1166,8 +1589,9 @@ figure.ph.cl{position:absolute}
       var table = tpl.content.querySelector('table').cloneNode(true);
       var fill = names(s.getAttribute('data-fill'));
       var hl = names(s.getAttribute('data-highlight'));
-      each(table.querySelectorAll('tbody tr'), function (tr) {
+      each(table.querySelectorAll('tbody tr'), function (tr, i) {
         var name = tr.cells[0].textContent.trim();
+        tr.style.setProperty('--i', i);
         if (fill.indexOf('전부') < 0 && fill.indexOf(name) < 0) tr.classList.add('empty');
         if (hl.indexOf(name) >= 0) tr.classList.add('hl');
       });
@@ -1185,6 +1609,14 @@ figure.ph.cl{position:absolute}
     });
   }
 
+  /* 두 단 장의 왼쪽 글이 무대보다 길면 글자를 한 단계 줄인다 */
+  function fitColumns() {
+    each(deck.querySelectorAll('.main-col'), function (col) {
+      col.classList.remove('tight');
+      if (col.scrollHeight > 916) col.classList.add('tight');
+    });
+  }
+
   /* ---------- 73–76 패턴 ---------- */
   function buildPattern() {
     var tpl = document.getElementById('pattern-data');
@@ -1193,10 +1625,84 @@ figure.ph.cl{position:absolute}
       var step = parseInt(s.getAttribute('data-step'), 10) || 1;
       var pt = tpl.content.querySelector('.pt').cloneNode(true);
       each(pt.querySelectorAll('[data-k]'), function (el) {
-        if (parseInt(el.getAttribute('data-k'), 10) > step) el.classList.add('later');
+        var k = parseInt(el.getAttribute('data-k'), 10);
+        if (k > step) el.classList.add('later');
+        if (k === step) el.classList.add('new');
       });
       s.insertBefore(pt, s.firstChild);
     });
+  }
+
+  /* ---------- 움직임 준비: 단어 나누기, 순서 번호, 선 길이, 군중 피켓 ---------- */
+  function prepareMotion() {
+    // 큰 문장은 단어마다 하나씩 나타난다
+    each(deck.querySelectorAll('.bs'), function (p) {
+      if (p.children.length) return;
+      var words = p.textContent.trim().split(/\s+/);
+      p.innerHTML = '';
+      words.forEach(function (w, i) {
+        var span = document.createElement('span');
+        span.className = 'w';
+        span.style.setProperty('--i', i);
+        span.textContent = w;
+        p.appendChild(span);
+        if (i < words.length - 1) p.appendChild(document.createTextNode(' '));
+      });
+    });
+    // 순서대로 나타나는 요소에 번호를 붙인다
+    each(deck.querySelectorAll('.points, .facts-list, .chips, .icons'), function (list) {
+      each(list.children, function (el, i) { el.style.setProperty('--i', i); });
+    });
+    each(deck.querySelectorAll('.cal'), function (cal) {
+      each(cal.children, function (el, i) { el.style.setProperty('--i', i); });
+    });
+    // 아이콘 선이 그려지도록 길이를 1로 맞춘다
+    each(deck.querySelectorAll('.icons svg *'), function (el) { el.setAttribute('pathLength', '1'); });
+    // 숫자가 올라가는 큰 숫자
+    each(deck.querySelectorAll('.big, .tl-year, .tl-gap, .bn-main, .bn-side'), function (el) {
+      var t = el.textContent.trim();
+      if (/^\d{2,4}(년)?$/.test(t)) el.setAttribute('data-final', t);
+    });
+    // 피켓 장 뒤쪽의 군중 피켓
+    var spots = [
+      [3, 360, 250, 170, -7, .05, 3.1], [14, 470, 200, 140, 5, .18, 2.7], [-1, 640, 300, 190, 4, .3, 3.4],
+      [79, 380, 260, 170, 6, .1, 2.9], [89, 520, 220, 150, -6, .24, 3.3], [70, 690, 300, 200, -3, .36, 2.6],
+      [24, 760, 280, 180, -4, .42, 3.0], [55, 800, 240, 160, 7, .5, 2.8]
+    ];
+    each(deck.querySelectorAll('.slide[data-layout="placard"]'), function (s) {
+      var crowd = document.createElement('div');
+      crowd.className = 'crowd';
+      crowd.setAttribute('aria-hidden', 'true');
+      spots.forEach(function (p) {
+        var i = document.createElement('i');
+        i.style.cssText = 'left:' + p[0] + '%;top:' + p[1] + 'px;width:' + p[2] + 'px;height:' + p[3] + 'px;--r:' + p[4] + 'deg;--d:' + p[5] + 's;--bob:' + p[6] + 's';
+        crowd.appendChild(i);
+      });
+      s.insertBefore(crowd, s.firstChild);
+    });
+  }
+
+  /* 큰 숫자가 올라간다 (예: 1904 → 1964, 0 → 100년) */
+  function countUp(slide, gen) {
+    each(slide.querySelectorAll('[data-final]'), function (el) {
+      var m = /^(\d+)(.*)$/.exec(el.getAttribute('data-final'));
+      var n = parseInt(m[1], 10), suffix = m[2];
+      var from = n >= 1000 ? n - 60 : 0;
+      var delay = slide.style.getPropertyValue('--base') === '.6s' ? 600 : 300;
+      var start = performance.now() + delay, dur = 1100;
+      el.textContent = from + suffix;
+      function tick(now) {
+        if (gen !== playGen) { el.textContent = n + suffix; return; }
+        var p = Math.min(1, Math.max(0, (now - start) / dur));
+        var e = 1 - Math.pow(1 - p, 4);
+        el.textContent = Math.round(from + (n - from) * e) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+  function resetCounts(slide) {
+    each(slide.querySelectorAll('[data-final]'), function (el) { el.textContent = el.getAttribute('data-final'); });
   }
 
   /* ---------- 사진: 위치·확대, 없으면 자리표시 ---------- */
@@ -1246,7 +1752,21 @@ figure.ph.cl{position:absolute}
   }
 
   /* ---------- 61 비교 슬라이더 ---------- */
+  var hintFrame = null;
   function setPos(c, p) { c.style.setProperty('--pos', p + '%'); }
+  function stopHint() { if (hintFrame) cancelAnimationFrame(hintFrame); hintFrame = null; }
+  function hint(c) {
+    // 들어온 뒤 손잡이가 한 번 좌우로 움직여 끌 수 있다는 것을 보여 준다
+    stopHint();
+    var start = performance.now() + 1500, dur = 2200;
+    function frame(now) {
+      var t = (now - start) / dur;
+      if (t >= 1) { setPos(c, 50); hintFrame = null; return; }
+      if (t > 0) setPos(c, 50 + Math.sin(t * Math.PI * 2) * 22 * (1 - t * .3));
+      hintFrame = requestAnimationFrame(frame);
+    }
+    hintFrame = requestAnimationFrame(frame);
+  }
   function setupCompare() {
     each(deck.querySelectorAll('.compare'), function (c) {
       var dragging = false;
@@ -1256,6 +1776,7 @@ figure.ph.cl{position:absolute}
         setPos(c, Math.max(0, Math.min(100, p)));
       }
       c.addEventListener('pointerdown', function (e) {
+        stopHint();
         dragging = true;
         try { c.setPointerCapture(e.pointerId); } catch (err) { /* 무시 */ }
         update(e);
@@ -1285,13 +1806,6 @@ figure.ph.cl{position:absolute}
     });
   }
 
-  /* ---------- 67 원: 다 커지면 애니메이션 표시를 지운다 ---------- */
-  function setupCircles() {
-    each(deck.querySelectorAll('.circle[data-grow-from]'), function (circle) {
-      circle.addEventListener('animationend', function () { circle.classList.remove('grow'); });
-    });
-  }
-
   /* ---------- 무대 크기 ---------- */
   function fit() {
     var w = window.innerWidth, h = window.innerHeight;
@@ -1301,6 +1815,9 @@ figure.ph.cl{position:absolute}
   }
 
   /* ---------- 장 이동 ---------- */
+  var TRANSITION = ['enter-next', 'enter-prev', 'leave-next', 'leave-prev', 'enter-sweep', 'leave-sweep'];
+  function clearTransition(s) { TRANSITION.forEach(function (c) { s.classList.remove(c); }); }
+
   function go(i) {
     if (isNaN(i)) return;
     i = Math.max(0, Math.min(total - 1, i));
@@ -1308,28 +1825,64 @@ figure.ph.cl{position:absolute}
     var prev = cur;
     var from = prev >= 0 ? slides[prev] : null;
     var to = slides[i];
+    var dir = i > prev ? 'next' : 'prev';
+    var animate = motionOn && !!from;
+    var partChange = from && from.getAttribute('data-part') !== to.getAttribute('data-part');
+
+    playGen++;
+    stopHint();
     clearTimeout(leaveTimer);
-    slides.forEach(function (s) { s.classList.remove('leaving'); });
+    slides.forEach(function (s) {
+      if (s !== from && s !== to) { s.classList.remove('leaving', 'play'); clearTransition(s); resetCounts(s); }
+    });
     if (from) {
-      from.classList.remove('active', 'fade');
-      if (!reduced()) from.classList.add('leaving');
+      from.classList.remove('active');
+      clearTransition(from);
+      resetCounts(from);
+      if (animate) from.classList.add('leaving', partChange ? 'leave-sweep' : 'leave-' + dir);
+      else from.classList.remove('play');
     }
-    to.classList.remove('fade');
+    clearTransition(to);
+    to.classList.remove('play');
     to.classList.add('active');
-    if (from && !reduced()) { void to.offsetWidth; to.classList.add('fade'); }
-    if (from) leaveTimer = setTimeout(function () { from.classList.remove('leaving'); }, 150);
+    to.style.setProperty('--base', animate && partChange ? '.6s' : '.3s');
+    if (animate) {
+      void to.offsetWidth;
+      to.classList.add(partChange ? 'enter-sweep' : 'enter-' + dir);
+      if (partChange) runSweep(to.getAttribute('data-part'));
+    }
+    if (from) {
+      leaveTimer = setTimeout(function () {
+        from.classList.remove('leaving', 'play');
+        clearTransition(from);
+        clearTransition(to);
+      }, 1050);
+    }
     cur = i;
+    if (motionOn) { void to.offsetWidth; to.classList.add('play'); countUp(to, playGen); }
     onEnter(to, prev);
     updateChrome();
     writeHash();
   }
 
+  function runSweep(part) {
+    var c = PART_COLOR[part] || PART_COLOR.intro;
+    sweep.style.setProperty('--sw', c[0]);
+    sweep.style.setProperty('--sw-on', c[1]);
+    sweep.firstChild.textContent = PART_NAME[part] || '';
+    sweep.classList.remove('go');
+    void sweep.offsetWidth;
+    sweep.classList.add('go');
+  }
+  sweep.addEventListener('animationend', function () { sweep.classList.remove('go'); });
+
   function onEnter(slide, prevIndex) {
-    each(deck.querySelectorAll('.circle.grow'), function (c) { c.classList.remove('grow'); });
-    each(slide.querySelectorAll('.compare'), function (c) { setPos(c, 50); });
+    each(slide.querySelectorAll('.compare'), function (c) { setPos(c, 50); if (motionOn) hint(c); });
+    // 67번 원: 66번에서 넘어올 때만 커진다. 표시는 다음에 67번에 들어올 때까지 남겨 둔다
     each(slide.querySelectorAll('.circle[data-grow-from]'), function (circle) {
+      circle.classList.remove('grow');
       var prevN = prevIndex >= 0 ? slides[prevIndex].getAttribute('data-n') : null;
-      if (prevN === circle.getAttribute('data-grow-from') && !reduced()) {
+      if (prevN === circle.getAttribute('data-grow-from') && motionOn) {
         void circle.offsetWidth;
         circle.classList.add('grow');
       }
@@ -1385,7 +1938,7 @@ figure.ph.cl{position:absolute}
     digitTimer = setTimeout(clearDigits, 1500);
   }
 
-  /* ---------- 전체 화면 · 선택 장 · 메모 · 목록 ---------- */
+  /* ---------- 전체 화면 · 선택 장 · 움직임 · 메모 · 목록 ---------- */
   function toggleFullscreen() {
     var d = document, el = d.documentElement;
     if (d.fullscreenElement || d.webkitFullscreenElement) {
@@ -1399,6 +1952,18 @@ figure.ph.cl{position:absolute}
     skipMode = on;
     stage.classList.toggle('skip', on);
     try { sessionStorage.setItem('deck-skip', on ? '1' : '0'); } catch (err) { /* 무시 */ }
+  }
+  function setMotion(on, remember) {
+    motionOn = on;
+    stage.classList.toggle('motion', on);
+    stage.classList.toggle('still', !on);
+    if (!on) {
+      playGen++;
+      stopHint();
+      slides.forEach(function (s) { s.classList.remove('play', 'leaving'); clearTransition(s); resetCounts(s); });
+      sweep.classList.remove('go');
+    }
+    if (remember) { try { sessionStorage.setItem('deck-motion', on ? '1' : '0'); } catch (err) { /* 무시 */ } }
   }
   function toggleNotes() {
     notesOpen = !notesOpen;
@@ -1414,10 +1979,12 @@ figure.ph.cl{position:absolute}
       var frame = document.createElement('div');
       frame.className = 'ov-frame';
       var clone = s.cloneNode(true);
-      clone.classList.remove('active', 'leaving', 'fade');
+      clone.classList.remove('active', 'leaving', 'play');
+      TRANSITION.forEach(function (c) { clone.classList.remove(c); });
       clone.removeAttribute('id');
       each(clone.querySelectorAll('[id]'), function (el) { el.removeAttribute('id'); });
       each(clone.querySelectorAll('.grow'), function (el) { el.classList.remove('grow'); });
+      resetCounts(clone);
       frame.appendChild(clone);
       var num = document.createElement('span');
       num.className = 'ov-num';
@@ -1463,6 +2030,7 @@ figure.ph.cl{position:absolute}
 
     if (code === 'KeyF') { toggleFullscreen(); }
     else if (code === 'KeyS') { setSkip(!skipMode); }
+    else if (code === 'KeyM') { setMotion(!motionOn, true); }
     else if (code === 'KeyN') { toggleNotes(); }
     else if (code === 'KeyO') { openOverview(); }
     else {
@@ -1519,18 +2087,23 @@ figure.ph.cl{position:absolute}
   buildSpeech();
   buildSummary();
   buildPattern();
+  prepareMotion();
   setupImages();
   addBoardIcons();
   setupCompare();
-  setupCircles();
   setupAspectFrames();
-  fitSummary();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSummary);
-  window.addEventListener('load', fitSummary);
+  function fitAll() { fitSummary(); fitColumns(); }
+  fitAll();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
+  window.addEventListener('load', fitAll);
   fit();
   window.addEventListener('resize', fit);
   window.addEventListener('hashchange', function () { go(readHash()); });
   try { setSkip(sessionStorage.getItem('deck-skip') === '1'); } catch (err) { setSkip(false); }
+  var savedMotion = null;
+  try { savedMotion = sessionStorage.getItem('deck-motion'); } catch (err) { /* 무시 */ }
+  setMotion(savedMotion === null ? !reduced() : savedMotion === '1', false);
+  if (motionQuery && motionQuery.addEventListener) motionQuery.addEventListener('change', function () { setMotion(!reduced(), false); });
   go(readHash());
 })();
 </script>
