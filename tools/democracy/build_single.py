@@ -37,9 +37,11 @@ def main() -> int:
 
     html, n_fonts = re.subn(r'url\("fonts/([^"]+\.woff2)"\)', font, html)
 
-    cache, embedded, missing = {}, set(), set()
+    cache, embedded, missing, placed = {}, set(), set(), set()
 
     def image(m):
+        # 같은 사진은 처음 나오는 한 곳에만 넣고(data-src-key), 나머지는 그 이름을 가리킨다(data-src-ref).
+        # 장마다 같은 사진을 되풀이해 넣지 않으므로 파일이 커지지 않는다. 페이지 스크립트가 src를 채운다.
         name = m.group(1)
         if name not in cache:
             path = images / name
@@ -50,7 +52,12 @@ def main() -> int:
             else:
                 cache[name] = None
                 missing.add(name)
-        return f'src="{cache[name]}"' if cache[name] else m.group(0)
+        if not cache[name]:
+            return m.group(0)
+        if name in placed:
+            return f'data-src-ref="{name}"'
+        placed.add(name)
+        return f'src="{cache[name]}" data-src-key="{name}"'
 
     html = re.sub(r'src="images/([^"]+)"', image, html)
     out.parent.mkdir(parents=True, exist_ok=True)
